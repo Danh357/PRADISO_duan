@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Dropdown</title>
+    <style>
+        /* Đặt font chữ và căn giữa */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f5;
+        }
+
+        .container {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Nút menu chính */
+        #menuButton {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #menuButton:hover {
+            background-color: #45a049;
+        }
+
+        /* Bảng dropdown với hiệu ứng trượt */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease, opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        /* Hiển thị dropdown với hiệu ứng trượt xuống */
+        .container.show .dropdown {
+            max-height: 200px; /* Đặt chiều cao tối đa đủ lớn cho nội dung */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Các liên kết trong dropdown */
+        .dropdown a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="menuButton">Menu</button>
+        <div id="dropdown" class="dropdown">
+            <a href="#profile">Hồ sơ cá nhân</a>
+            <a href="#logout">Đăng xuất</a>
+        </div>
+    </div>
+
+    <script>
+        const menuButton = document.getElementById('menuButton');
+        const container = document.querySelector('.container');
+
+        menuButton.addEventListener('click', function() {
+            container.classList.toggle('show');
+        });
+
+        // Đóng bảng khi click bên ngoài
+        window.onclick = function(event) {
+            if (!event.target.matches('#menuButton')) {
+                container.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
