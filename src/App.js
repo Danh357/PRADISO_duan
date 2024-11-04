@@ -6,6 +6,8 @@ import Home from './jsx/Home';
 import ChiTiet from './jsx/ChiTiet';
 import Thanhtoan from './jsx/thanhtoan';
 import ScrollManager from './jsx/ScrollManager';
+import CamNang from './jsx/Camnang';
+
 
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import 'aos/dist/aos.css'; // Import CSS của AOS
@@ -13,6 +15,8 @@ import { useEffect } from 'react';
 import Aos from 'aos';
 import Thich from './jsx/yeuthich';
 import Phong from './jsx/phong';
+import Lienhe from './jsx/Lienhe';
+
 
 function App() {
   useEffect(() => {
@@ -29,13 +33,15 @@ function App() {
      <Routes>
           <Route path="/" excact element={<Home />} />
           <Route path="/phong" excact element={<Phong />} />
-          <Route path="/thich/:id" excact element={<Thich />} />
-          {/* <Route path="/chitiet" excact element={<ChiTiet />} /> */}
-          <Route path="/thanhtoan" excact element={<Thanhtoan />} />
-          {/* <Route path="/homestay" excact element={<Phong />} /> */}
-          <Route path="/homestay/:id" element={<ChiTiet />} />
-          {/* <Route path="/room/:id" element={<ChiTiet />} /> */}
           <Route path="/thanhtoan" element={<Thanhtoan />} />
+          <Route path="/cndulich" element={<CamNang />} />
+          <Route path="/lienhe" element={<Lienhe />} />
+
+          <Route path="/thich/:id" excact element={<Thich />} />
+          <Route path="/homestay/:id" element={<ChiTiet />} />
+          {/* <Route path="/chitiet" excact element={<ChiTiet />} /> */}
+          {/* <Route path="/homestay" excact element={<Phong />} /> */}
+          {/* <Route path="/room/:id" element={<ChiTiet />} /> */}
       </Routes>
      <Footer/>
     </div>
