@@ -16,6 +16,7 @@ import Aos from 'aos';
 import Thich from './jsx/yeuthich';
 import Phong from './jsx/phong';
 import Lienhe from './jsx/Lienhe';
+import Gioithieu from './jsx/Gioithieu';
 
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
           <Route path="/thanhtoan" element={<Thanhtoan />} />
           <Route path="/cndulich" element={<CamNang />} />
           <Route path="/lienhe" element={<Lienhe />} />
+          <Route path="/gioithieu" element={<Gioithieu />} />
+
 
           <Route path="/thich/:id" excact element={<Thich />} />
           <Route path="/homestay/:id" element={<ChiTiet />} />
