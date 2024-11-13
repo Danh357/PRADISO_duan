@@ -1,125 +1,200 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState,useEffect } from 'react';
+import { useParams } from "react-router-dom"
+import { Link } from 'react-router-dom';
+
 // import './Banner.css';
 
 const Gioithieu = () => {
+    const { id } = useParams();
+    const [showhomestay, setHomestay] = useState(null); // Lưu thông tin homestay
+    const [error, setError] = useState(null); // Lưu lỗi nếu có
+    useEffect(() => {
+        axios.get(`http://localhost:3000/homestay`)
+          .then(response => {
+            setHomestay(response.data); // Lưu thông tin homestay vào state
+          })
+          .catch(err => {
+            setError("Lỗi khi tải dữ liệu homestay");
+          });
+      }, [id]);
     return (
         <div>
             {/* Banner Section */}
-            <section className="banner-top">
-                <img
-                    src="https://theme.hstatic.net/200000909393/1001269498/14/banner_header_about_us.jpg?v=2535" 
-                    alt="Khách sạn từ năm 1998"
-                    className="banner-image"
-                />
-                <div className="banner-text-top">
-                    <h3>MỘT KHÁCH SẠN MANG TÍNH BIỂU TƯỢNG TỪ NĂM 1998</h3>
-                    <h1>Giới thiệu</h1>
-                    <p>Thiên đường nghỉ dưỡng, yên tĩnh và phục hồi</p>
+            <div className="banner gioithieu">
+                <div className="wap_name_dt_rr">
+                <div className="min_warp2">
+                    <div className="name_menu_date_restaurant" data-aos="fade-up"  data-aos-duration="3000">
+                    <p className="name_menu">Một khách sạn mang tính biểu tượng từ năm 1998</p>
+                    <h1 className="restaurant">Giới Thiệu</h1>
+                    <p class="date">Thiên đường nghỉ dưỡng, yên tĩnh và phục hồi.</p>
+                    </div>
                 </div>
-            </section>
+                </div>
+            </div>
 
             {/* Content Section with Image and Text */}
-            <section className="content-section">
-                <p className="welcome-text">CHÀO MỪNG BẠN ĐẾN VỚI MAPLE INN</p>
-                <h2>Nằm ngay trung tâm thành phố, cảnh quan tuyệt đẹp</h2>
-                <p className="description-text">
-                    Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.
-                </p>
-            </section>  
-
-            {/* Image Row Section */}
-            <section className="image-row-section min_warp2">
-                <div className="image-row">
-                    <div className="image-item">
-                        <img 
-                            src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_1.jpg?v=2537" 
-                            alt="Ảnh 1"
-                            className="image"
-                        />
-                    </div>
-                    <div className="image-item">
-                        <img 
-                            src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_2.jpg?v=2537" 
-                            alt="Ảnh 2"
-                            className="image"
-                        />
-                    </div>
-                    <div className="image-item">
-                        <img 
-                            src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_3.jpg?v=2537" 
-                            alt="Ảnh 3"
-                            className="image"
-                        />
-                    </div>
+            <div class="row8">
+                <div class="heading_title mg9 about-content" data-aos="fade-up" data-aos-duration="1500">
+                    <p class="title1">CHÀO MỪNG BẠN ĐẾN VỚI PARADISO</p>
+                    <h2 class="title2">Nằm ngay trung tâm thành phố, cảnh quan tuyệt đẹp</h2>
+                    <p class="heading_desc">  Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.</p>
                 </div>
-            </section>
+                  {/* Image Row Section */}
+                <section className="image-row-section min_warp2">
+                    <div className="image-row">
+                        <div className="image-item">
+                            <img 
+                                src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_1.jpg?v=2537" 
+                                alt="Ảnh 1"
+                                className="image"
+                            />
+                        </div>
+                        <div className="image-item">
+                            <img 
+                                src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_2.jpg?v=2537" 
+                                alt="Ảnh 2"
+                                className="image"
+                            />
+                        </div>
+                        <div className="image-item">
+                            <img 
+                                src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_1_banner_3.jpg?v=2537" 
+                                alt="Ảnh 3"
+                                className="image"
+                            />
+                        </div>
+                    </div>
+                </section>
+            </div>
 
             {/* Banner Below Images */}
-            <section className="banner-bottom">
-                <img
-                    src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_parallax_bg.jpg?v=2535" 
-                    alt="Tận hưởng kỳ nghỉ tại Paradiso"
-                    className="banner-image-bottom"
-                />
-                <div className="banner-text-bottom">
-                    <h3>TẬN HƯỞNG KỲ NGHỈ CỦA BẠN TẠI PARADISO</h3>
-                    <h1>Hãy tận hưởng kỳ nghỉ thoải mái của bạn tại trung tâm khu rừng xinh đẹp</h1>
+           <div className="bg_banner_bottom">
+                <section className="banner-bottom">
+                    <div className="banner-text-bottom">
+                        <h3>TẬN HƯỞNG KỲ NGHỈ CỦA BẠN TẠI PARADISO</h3>
+                        <h2 class="title2">Hãy tận hưởng kỳ nghỉ thoải mái của bạn tại trung tâm khu rừng xinh đẹp</h2>
+                    </div>
+                    {/* Overlay Text */}
+                    <div className="banner-overlay-text">
+                      <div className="col-lg-3">
+                        <div class="counter-icon">
+                                <div class="counter">72</div>
+                                <div class="text_couter">Phòng Premium</div>
+                            </div>
+                      </div>
+                      <div className="col-lg-3">
+                        <div class="counter-icon">
+                                <div class="counter">20</div>
+                                <div class="text_couter">Phòng Deluxe</div>
+                            </div>
+                      </div>
+                      <div className="col-lg-3">
+                        <div class="counter-icon">
+                                <div class="counter">12</div>
+                                <div class="text_couter">Nhà gỗ riêng</div>
+                            </div>
+                      </div>
+                      <div className="col-lg-3">
+                        <div class="counter-icon">
+                                <div class="counter">9</div>
+                                <div class="text_couter">Năm thành lập</div>
+                            </div>
+                      </div>
+                       
+                    </div>
+                </section>
+           </div>
+           <div className="min_warp2">
+              <div className="row8 row_gioithieu">
+                <div class="col-lg-6 col-12 about-content">
+                    <div class="heading-title">
+                        <p class="title1">Trải nghiệm lưu trú tuyệt vời tại Maple Inn</p>
+                        <h2 class="title2">Phòng nghỉ tự nhiên và nhà gỗ riêng</h2>
+                        <p class="heading_desc">Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.</p>
+                    </div>              
+                    <div className="btn-more text_left">
+                        <button type="submit" className="ocean-button">
+                        Đặt phòng ngay
+                        </button>
+                    </div>
                 </div>
-
-                {/* Overlay Text */}
-                <div className="banner-overlay-text">
-                    <h4>72</h4>
-                    <h4>Phòng Premium</h4>
-                    <h4>20</h4>
-                    <h4>Phòng Deluxe</h4>
-                    <h4>12</h4>
-                    <h4>Nhà gỗ riêng</h4>
-                    <h4>9</h4>
-                    <h4>Năm thành lập</h4>
-                </div>
-            </section>
-        
-            <div className="row1">
-            <section className="content-boxes">
-                <div className="text-box">
-                    <h2>Trải nghiệm lưu trú tuyệt vời tại Maple Inn</h2>
-                    <h1>Phòng nghỉ tự nhiên và nhà gỗ riêng</h1>
-                    <p>
-                        Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.
-                    </p>
-                    <button className="book-now-button">Đặt phòng ngay</button> {/* Button added here */}
-                </div>
-                <div className="image-box">
-                    <img
-                        src="https://product.hstatic.net/200000909393/product/clay-banks-tgpeqzybnkc-unsplash-780x520_eecbdd4aeb6d47f28fcdceebd40bf604_1024x1024.jpg" 
-                        alt="Phòng nghỉ tại Maple Inn"
-                        className="room-image"
-                    />
-                </div>
-            </section>
-            <section className="content-boxess">
-                <div className="image-box">
-                    <img
-                        src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_3_banner_1.jpg?v=2537" 
-                        alt="Hình ảnh nhỏ Maple Inn"
-                        className="room-image-small"
-                    />
-                    <img
-                        src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_3_banner_2.jpg?v=2537" 
-                        alt="Phòng nghỉ tại Maple Inn"
-                        className="room-image-large"
-                    />
-                </div>
-                <div className="text-box">
-                    <h2>Trải nghiệm lưu trú tuyệt vời tại Maple Inn</h2>
-                    <h1>Phòng nghỉ tự nhiên và nhà gỗ riêng</h1>
-                    <p>
-                        Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.
-                    </p>
-                    <button className="book-now-button">Đặt phòng ngay</button>
-                </div>
-            </section>     
-            </div>
+                <div className="col-lg-6">
+                    <ul className="homestay_list_gioithieu homestay-section" data-aos="fade-up" data-aos-duration="2000">
+                        {Array.isArray(showhomestay) && showhomestay.slice(0, 1).map((homestay) => (
+                            <li key={homestay.id_homestay}>
+                                <Link to={''}>
+                                    <div className="img_homstay img_gioithieu">
+                                        <div className="pro-price">
+                                            <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                            <span>/ Đêm</span>
+                                        </div>
+                                        <img src="/image/HST2.png" alt="" />
+                                    </div>
+                                    <div className="des_hst gioithieu">
+                                        <div className="proloop-detail content_gioithieu">
+                                            <h3><Link to="#">{homestay.ten_homestay}</Link></h3>
+                                            <div className="pro-tag content_gioithieu">
+                                                <div className="tag-item tag-area">
+                                                    <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
+                                                </div>
+                                                <div className="tag-item tag-guests">
+                                                    <span>10</span> <span className="tag-unit">Guests</span>
+                                                </div>
+                                                <div className="tag-item tag-bed">
+                                                    <span>5</span> <span className="tag-unit">Beds</span>
+                                                </div>
+                                                <div className="tag-item tag-bathroom">
+                                                    <span>4</span> <span className="tag-unit">Bathroom</span>
+                                                </div>
+                                            </div>
+                                            <div className="pro-desc content_gioithieu">
+                                                Double Suite rộng 150m² với thiết kế trong suốt, nằm ở tầng cao nhất của khách sạn, mang đến tầm nhìn toàn cảnh tuyệt đẹp...
+                                            </div>
+                                            <div className="btn_ev content_gioithieu">
+                                                <Link to={"/homestay/" + homestay.id_homestay}>
+                                                    <span>Xem chi tiết
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
+                                                    </span>
+                                                </Link>
+                                            </div>   
+                                        </div>
+                                    </div>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+               </div>
+              </div>
+              <section className="content-boxess">
+                    <div className="image-box">
+                        <img
+                            src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_3_banner_1.jpg?v=2537" 
+                            alt="Hình ảnh nhỏ Maple Inn"
+                            className="room-image-small"
+                        />
+                        <img
+                            src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_3_banner_2.jpg?v=2537" 
+                            alt="Phòng nghỉ tại Maple Inn"
+                            className="room-image-large"
+                        />
+                    </div>
+                    <div className="text-box">
+                    <div class="heading-title">
+                        <p class="title1">Trải nghiệm lưu trú tuyệt vời tại PARADISO</p>
+                        <h2 class="title2">Trải nghiệm thiên nhiên tuyệt vời nhất</h2>
+                        <p class="heading_desc">Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.</p>
+                    </div>   
+                    <div className="btn-more text_left">
+                        <button type="submit" className="ocean-button">
+                        Khám phá ngay
+                        </button>
+                    </div>  
+                    </div>
+              </section>     
+           </div>
+          
+              
         
 {/* <!-- service --> */}
             <div className="bg_service" data-aos="fade-up" data-aos-duration="1500">

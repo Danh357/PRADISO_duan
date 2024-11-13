@@ -1,15 +1,16 @@
 
+
 // export default LoginForm;
 // import './Form.css';
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 const LoginForm = () => {
     const [email_user, setEmail] = useState("");
     const [pass_user, setPassword] = useState("");
     const [showRegisterLink, setShowRegisterLink] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); 
+    // const navigate = useNavigate(); 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -38,55 +39,62 @@ const LoginForm = () => {
         }
     };
     return (
-        <div className="form">
-            <form className="Auth-form" onSubmit={handleSubmit}>
-                <div className="Auth-form-content">
-                    <h3 className="Auth-form-title">Đăng nhập</h3>
-                    <div className="form-group mt-3">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            // type="email"
-                            className="form-control"
+        <div className="main_form">
+            <div className="danh">242</div>
+            <div className="wap_form_dk_dn">
+                <div className="form_dangnhap">
+                    <form className="Auth-form_dangnhap" onSubmit={handleSubmit}>
+                        <div className="Auth-form-content_dangnhap">
+                        <h3 className="Auth-form-title_dangnhap">Đăng nhập</h3>
+                        <div className="form-group_dangnhap mt-3">
+                            <label htmlFor="email" className="label_dangnhap">Email</label>
+                            <input
+                            type="email"
+                            className="form-control_dangnhap"
                             id="email"
                             placeholder="Enter email"
                             value={email_user}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                        />
-                    </div>
-                    <div className="form-group mt-3">
-                        <label htmlFor="password">Password</label>
-                        <input
+                            />
+                        </div>
+                        <div className="form-group_dangnhap mt-3">
+                            <label htmlFor="password" className="label_dangnhap">Password</label>
+                            <input
                             type="password"
-                            className="form-control"
+                            className="form-control_dangnhap"
                             id="password"
                             placeholder="Enter password"
                             value={pass_user}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                        />
-                    </div>
-                    <div className="d-grid gap-2 mt-3">
-                        <button type="submit" className="btn btn-primary">
+                            />
+                        </div>
+                        <div className="d-grid_dangnhap gap-2_dangnhap mt-3">
+                            <button type="submit" className="btn_dangnhap btn-primary_dangnhap">
                             Đăng nhập
-                        </button>
-                    </div>
-                    {showRegisterLink === '' ? null : (
-                showRegisterLink === 'true' ? (
-                    <div className="mt-3 text-center text-success">
-                        Đăng nhập thành công chuyển hướng sau 3s
-                    </div>
-                ) : (
-                    <div className="mt-3 text-center text-danger">
-                        {error}
-                        <br />
-                        <Link to="/register">Đăng ký tại đây</Link>
-                    </div>
-                )
-            )}
+                            </button>
+                        </div>
+                        {showRegisterLink === '' ? null : (
+                            showRegisterLink === 'true' ? (
+                            <div className="mt-3 text-center_dangnhap text-success_dangnhap">
+                                Đăng nhập thành công, chuyển hướng sau 3s
+                            </div>
+                            ) : (
+                            <div className="mt-3 text-center_dangnhap text-danger_dangnhap">
+                                {error}
+                                <br />
+                                <Link to="/register" className="register-link_dangnhap">Đăng ký tại đây</Link>
+                            </div>
+                            )
+                        )}
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+           
         </div>
+       
     );
 };
 

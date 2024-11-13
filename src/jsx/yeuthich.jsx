@@ -76,7 +76,7 @@ function Thich() {
                 <div className="product_view">
                     <div className="product_view_content">
                         <ul className="product_cate">
-                            <li className="product_cate_item active-2">
+                            {/* <li className="product_cate_item active-2">
                                 <a href="">Mặc định</a>
                             </li>
                             <li className="product_cate_item">
@@ -93,9 +93,9 @@ function Thich() {
                             </li>
                             <li className="product_cate_item">
                                 <a href="#">Khuyến mãi</a>
-                            </li>
-                            <li className="product_cate_item">
-                                <button onClick={removeAllFavorites} to="#">Xóa tất cả yêu thích</button>
+                            </li> */}
+                            <li className="product_cate_item"  onClick={removeAllFavorites}>
+                                <span to="#">Xóa tất cả yêu thích</span>
                             </li>
                         </ul>
                     </div>

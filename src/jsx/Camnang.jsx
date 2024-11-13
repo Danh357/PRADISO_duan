@@ -1,11 +1,13 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 // import './camnang.css';
 const CamNang = () => {
   return (
     <main className="wrapperMain_content">
+      <div className="danh">12233</div>
       <div className="layout-blogs">
         <div className="breadcrumb-shop">
-          <div className="container">
+          <div className="min_warp2 ">
             <div className="breadcrumb-list  ">
               <ol
                 className="breadcrumb breadcrumb-arrows"
@@ -17,9 +19,9 @@ const CamNang = () => {
                   itemscope
                   itemtype="http://schema.org/ListItem"
                 >
-                  <a href="/" target="_self" itemprop="item">
+                  <Link to="/" target="_self" itemprop="item">
                     <span itemprop="name">Trang chủ</span>
-                  </a>
+                  </Link>
                   <meta itemprop="position" content="1" />
                 </li>
 
@@ -42,17 +44,17 @@ const CamNang = () => {
           </div>
         </div>
         <div className="wrapper-contentBlogs">
-          <div className="container pd-top">
-            <div className="row dFlex-row">
+          <div className="min_warp2 pd-top">
+            <div className="row6 dFlex-row">
               <div className="col-lg-9 col-md-12 col-12 boxBlog-left">
                 <div className="listBlogs-content">
                   <div className="heading-page">
                     <h1>Tin tức</h1>
                   </div>
-                  <div className="list-article-content blog-posts row">
+                  <div className="list-article-content blog-posts row6">
                     {/* <!-- Begin: Nội dung blog --> */}
 
-                    <article className="article-loop col-md-6 col-6">
+                    <article className="article-loop col-md-6 col-6 col_col ">
                       <div className="article-inner">
                         <div className="article-image">
                           <a
@@ -98,7 +100,7 @@ const CamNang = () => {
                       </div>
                     </article>
 
-                    <article className="article-loop col-md-6 col-6">
+                    <article className="article-loop col-md-6 col-6 col_col">
                       <div className="article-inner">
                         <div className="article-image">
                           <a
@@ -144,7 +146,7 @@ const CamNang = () => {
                       </div>
                     </article>
 
-                    <article className="article-loop col-md-6 col-6">
+                    <article className="article-loop col-md-6 col-6 col_col">
                       <div className="article-inner">
                         <div className="article-image">
                           <a
@@ -190,7 +192,7 @@ const CamNang = () => {
                       </div>
                     </article>
 
-                    <article className="article-loop col-md-6 col-6">
+                    <article className="article-loop col-md-6 col-6 col_col">
                       <div className="article-inner">
                         <div className="article-image">
                           <a

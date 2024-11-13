@@ -156,7 +156,7 @@ useEffect(() => {
               <div className="min_warp2">
                 <div className="name_menu_date_restaurant" data-aos="fade-up"  data-aos-duration="3000">
                   <p className="name_menu">Khám phá dịch vụ & tiện nghi </p>
-                  <h1 className="restaurant">Homestay</h1>
+                  <h1 className="restaurant">Phòng</h1>
                 </div>
               </div>
             </div>
@@ -313,9 +313,9 @@ useEffect(() => {
                     </div>
             </div>
           </div>
-          <section className="section-collection-about-1" style={{padding: '100px 0' }}>
+          <section className="section-collection-about-1">
             <div className="min_warp2">
-              <div className="heading-title text-center">
+              <div className="heading-title text-center row1">
                 <p className="more1">Chào mừng bạn đến với Paradiso</p>
                 <h2 className="more2">
                   Tận hưởng quang cảnh biển xanh từ những ngôi nhà với thiết kế
@@ -344,7 +344,7 @@ useEffect(() => {
               </div>
             </div>
           </section>
-          <section className="section-collection-col section-collection-col-1" style={{padding: '100px 0' }}>
+          <section className="section-collection-col section-collection-col-1">
             <div className="col-banner" style={{"--bg-col-all": "url(//theme.hstatic.net/200000909393/1001269498/14/collection_col_1_banner.jpg?v=2537)"}}>
               <div className="container breadcrumb-content text-center">
                 <p className="breadcrumb-more1">
@@ -358,118 +358,94 @@ useEffect(() => {
               </div>
             </div>
             <div className="min_warp2">
-              <div className="row_homelist list-pro list-pro-1">
-              {currentHomestays.map((homestay, index) => (
-                <div className="col-pro-style-1"  key={index}>
-                  <div className="product-loop product-loop-style-1">
-                    <div className="product-inner">
-                      <div className="proloop-image">
-                        <div className="pro-price">
-                          <span className="price">{homestay.gia_homestay}</span>
-                          <span>/ Đêm</span>
+              <div className="btn_slide">
+                          {/* <div className="owl-nav">
+                              <button type="button" role="presentation" className="owl-prev" aria-label="prev slide">
+                                  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" className=""><g transform="matrix(-1,-1.2246467991473532e-16,1.2246467991473532e-16,-1,511.9994964599609,511.99959468841564)"><g><g><path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path></g></g></g></svg>
+                              </button>
+                              <button type="button" role="presentation" className="owl-next" aria-label="next slide">
+                                  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" className=""><g><g><g><path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path></g></g></g></svg>
+                              </button>
+                          </div> */}
+              </div>
+              <div className="row1">
+                <ul className="homestay_li2" data-aos="fade-up" data-aos-duration="2000">
+                  {Array.isArray(currentHomestays) && currentHomestays.map((homestay) => (
+                    <li key={homestay.id_homestay}>
+                      <Link to={"/homestay/" + homestay.id_homestay}>
+                        <div className="img_homstay">
+                          <div className="pro-price">
+                            <span className="price">
+                              {homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                            </span>
+                            <span>/ Đêm</span>
+                          </div>
+                          <div className="product--image img-slide">
+                            {images.length > 0 ? (
+                              images.map((image, index) => {
+                                if (homestay.id_homestay === image.id_hinh) {
+                                  return (
+                                    <div key={index} className="lazy-img">
+                                      <img
+                                        className="img-loop"
+                                        src={image.url_hinh}
+                                        alt={homestay.ten_homestay || 'Hình ảnh homestay'}
+                                      />
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })
+                            ) : (
+                              <p>Không có hình để hiển thị</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="owlCarousel-style owl-carousel owl-loaded owl-drag">
-                          <div className="owl-stage-outer owl-height" style={{ height: "410px" }}>
-                            <div className="owl-stage" style={{ transform: "translate3d(0px, 0px, 0px)", transition: "all", width: "3690px", }}>
-                              <div className="owl-item active" style={{ width: "615px" }} >
-                                <a href="/products/double-suite">
-                                  <div className="product--image img-slide">
-                                  {images.length > 0 ? (
-                                    images.map((image, index) => {
-                                      if(homestay.id_homestay === image.id_hinh) {
-                                        return (
-                                          <div  key={index} className="lazy-img">
-                                            <img className="img-loop" src={image.url_hinh} alt={homestay.ten_homestay || 'Hình ảnh homestay'} />
-                                        </div>
-                                        )
-                                      }
-                                    }))
-                                    :
-                                    (
-                                    <p> Không có hình để hiển thị</p>
-                                    )}
-                                  </div>
-                                </a>
+                        <div className="des_hst">
+                          <div className="proloop-detail">
+                            <h3><Link to="#">{homestay.ten_homestay}</Link></h3>
+                            <div className="pro-tag">
+                              <div className="tag-item tag-area">
+                                <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
+                              </div>
+                              <div className="tag-item tag-guests">
+                                <span>10</span> <span className="tag-unit">Guests</span>
+                              </div>
+                              <div className="tag-item tag-bed">
+                                <span>5</span> <span className="tag-unit">Beds</span>
+                              </div>
+                              <div className="tag-item tag-bathroom">
+                                <span>4</span> <span className="tag-unit">Bathroom</span>
                               </div>
                             </div>
-                          </div>
-
-                          <div className="owl-nav">
-                            <button type="button" role="presentation" className="owl-prev disabled" aria-label="prev slide">
-                              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnsSvgjs="http://svgjs.com/svgjs" width="512" height="512" viewBox="0 0 512 512"style={{ enableBackground: "new 0 0 512 512" }} xmlSpace="preserve">
-                                <g transform="matrix(-1,-1.2246467991473532e-16,1.2246467991473532e-16,-1,511.9994964599609,511.99959468841564)">
-                                  <g>
-                                    <g>
-                                      <path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path>
-                                    </g>
-                                  </g>
-                                </g>
-                              </svg>
-                            </button>
-                            <button type="button" role="presentation" className="owl-next" aria-label="next slide">
-                              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlnsXlink="http://www.w3.org/1999/xlink" xmlnsSvgjs="http://svgjs.com/svgjs" width="512" height="512" viewBox="0 0 512 512" style={{ enableBackground: "new 0 0 512 512" }} xmlSpace="preserve">
-                                <g>
-                                  <g>
-                                    <g>
-                                      <path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path>
-                                    </g>
-                                  </g>
-                                </g>
-                              </svg>
-                            </button>
+                            <div className="pro-desc">
+                              {homestay.mota}
+                            </div>
+                            <div className="pro-desc" style={{ color: "red" }}>
+                              {homestay.TrangThai}
+                            </div>
+                            <div className="btn_ev">
+                              <Link to={"/homestay/" + homestay.id_homestay}>
+                                <span>Xem chi tiết
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                                    <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z" />
+                                  </svg>
+                                </span>
+                              </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="proloop-detail">
-                        <h3>
-                          <a href="/products/double-suite">{homestay.ten_homestay}</a>
-                        </h3>
-                        <div className="pro-tag">
-                          <div className="tag-item tag-area">
-                            <span>150</span>
-                            <span className="tag-unit">
-                              m<sup>2</sup>
-                            </span>
-                          </div>
-                          <div className="tag-item tag-guests">
-                            <span>10</span>
-                            <span className="tag-unit">Guests</span>
-                          </div>
-                          <div className="tag-item tag-bed">
-                            <span>5</span>
-                            <span className="tag-unit">Beds</span>
-                          </div>
-                          <div className="tag-item tag-bathroom">
-                            <span>4</span>
-                            <span className="tag-unit">Bathroom</span>
-                          </div>
-                        </div>
-                        <div className="pro-desc">
-                        {homestay.mota}
-                        </div>
-                        <div className="pro-desc" style={{color: "red"}}>
-                        {homestay.TrangThai}
-                        
-                        </div>
-                        <div className="btn_ev">
-                                                <Link to={"/homestay/" + homestay.id_homestay}>
-                                                    <span>Xem chi tiết
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
-                                                    </span>
-                                                </Link>
-                                            </div>   
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                ))}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                  {/* Phân trang */}
+                  <Pagination 
+                    homestaysPerPage={homestaysPerPage} 
+                    totalHomestays={homestay.length} 
+                    paginate={paginate} 
+                  />
               </div>
-              {/* Phân trang */}
-              <Pagination 
-                homestaysPerPage={homestaysPerPage} 
-                totalHomestays={homestay.length} 
-                paginate={paginate} 
-              />
             </div>
           </section>
           <section className="section-collection-about-2"style={{"--bg-col-all":" url(//theme.hstatic.net/200000909393/1001269498/14/collection_about_2_banner.jpg?v=2537)"}}>

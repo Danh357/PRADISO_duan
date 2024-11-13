@@ -156,7 +156,7 @@ function Home() {
 
 return(
     <div className="section_menu">
-            <div className="banner index">
+        <div className="banner index">
             <div className="wap_name_dt_rr index">
                     <div className="min_warp2">
                     <div className="name_menu_date_restaurant"  data-aos="fade-up" data-aos-duration="3000">
@@ -169,6 +169,7 @@ return(
         </div>
         <div className="form_calendar_booking">
             <div className="min_warp3">
+              <div className="wap_form_booking">
                 <div className="form_booking">
                     <div className="checkin_homstay t-datepicker" >
                         <div className="date_check_in search_item"  onClick={() => setIsCheckInOpen(!isCheckInOpen)}>
@@ -190,7 +191,7 @@ return(
                                         <span className="t-year-check-in">{checkInDate.getFullYear()}</span>
                                     </div>
                                     {isCheckInOpen && (
-                                    <div className="date-picker-container">
+                                    <div className="date-picker-container1">
                                     <DatePicker
                                     selected={checkInDate} // Ngày hiện tại
                                     onChange={(date) => {
@@ -232,7 +233,7 @@ return(
                                         <span className="t-year-check-out">{checkOutDate.getFullYear()}</span>
                                     </div>
                                     {isCheckOutOpen && (
-                                    <div className="date-picker-container">
+                                    <div className="date-picker-container2">
                                         <DatePicker
                                     selected={checkOutDate}
                                     onChange={(date) => {
@@ -332,6 +333,7 @@ return(
                     )}
                     </div>
                 </div>
+              </div>
             </div>
                 <div className="min_warp2">
                     <div className="row140">
@@ -405,11 +407,28 @@ return(
                                         <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                         <span>/ Đêm</span>
                                     </div>
-                                    <img src="/image/HST2.png" alt=""/>
+                                    {images.length > 0 ? (
+                                        images.map((image, index) => {
+                                        if (homestay.id_homestay === image.id_hinh) {
+                                            return (
+                                                <div key={image.id_homestay || index} className="add_img"> {/* Sử dụng image.id hoặc index */}
+                                                    <img
+                                                    src={image.url_hinh}
+                                                    alt={homestay.ten_homestay || 'Hình ảnh homestay'}
+                                                    />
+                                                </div>
+                                                );
+                                            }
+                                            return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
+                                            })
+                                        ) : (
+                                            <p>Không có hình để hiển thị</p>
+                                        )}
+                                    {/* <img src="/image/HST2.png" alt=""/> */}
                                 </div>
                                 <div className="des_hst">
                                     <div className="proloop-detail">
-                                        <h3><Link to="#">{homestay.ten_homestay}</Link></h3>
+                                        <h3><Link to={"/homestay/" + homestay.id_homestay}>{homestay.ten_homestay}</Link></h3>
                                         <div className="pro-tag">
                                             <div className="tag-item tag-area">
                                                 <span>150</span> <span className="tag-unit">m<sup>2</sup></span>

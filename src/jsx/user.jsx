@@ -67,7 +67,9 @@ const UserManagement = () => {
   };
 
   return (
-    <div>
+    <div className="main">
+      <div className="danh">124</div>
+       <div>
       <h1>Quản lý người dùng</h1>
       <table>
         <thead>
@@ -105,7 +107,9 @@ const UserManagement = () => {
           ))}
         </tbody>
       </table>
+       </div>
     </div>
+   
   );
 };
 
