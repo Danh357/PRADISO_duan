@@ -10,7 +10,7 @@ const ChiTiet = () => {
     const [checkOutDate, setCheckOutDate] = useState(new Date("2024-10-23"));
 
     const { id } = useParams();
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
     const storedUser = JSON.parse(localStorage.getItem('auth'));
     const [homestayCT, setHomestay] = useState(null);
     const [error, setError] = useState(null);
@@ -43,13 +43,12 @@ const ChiTiet = () => {
                 setError("Lỗi khi tải dữ liệu homestay");
             });
     }, [id]);
-    //lien quan
+//san pham lien quan
     useEffect(() => {
         const fetchRooms = async () => {
           try {
             const response = await fetch(`http://localhost:3000/homestaylienquan/${id}`);
             const data = await response.json();
-            console.log(data); // Kiểm tra dữ liệu từ API
       
             // Lọc dữ liệu để loại bỏ các id_homestay trùng lặp
             const uniqueRooms = data.filter((room, index, self) => 
@@ -94,50 +93,145 @@ const ChiTiet = () => {
             };
             fetchUserData();
         }
-    }, [storedUser]);
-      
-      const addToFavorites = () => {
-        if (!storedUser) {
-            // Nếu chưa đăng nhập, hiển thị thông báo và điều hướng đến trang đăng nhập
-            const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
-            if (goToLogin) {
-                window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+    }, []);
+///them vào yeu thich
+    const addToFavorites = () => {
+    if (!storedUser) {
+        // Nếu chưa đăng nhập, hiển thị thông báo và điều hướng đến trang đăng nhập
+        const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
+        if (goToLogin) {
+            window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+        }
+        return;
+    }
+    if (homestayCT) { // Kiểm tra nếu dữ liệu homestay đã tải
+        try {
+            const existingFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            
+            // Kiểm tra xem homestay đã có trong danh sách yêu thích chưa
+            const isFavorite = existingFavorites.some(item => item.id_homestay === homestayCT.id_homestay);
+            
+            if (!isFavorite) {
+                const updatedFavorites = [...existingFavorites, homestayCT];
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                
+                // Hiển thị thông báo với hai lựa chọn
+                const goToFavorites = window.confirm("Đã thêm vào danh sách yêu thích. Bạn có muốn đi đến trang yêu thích?");
+                
+                if (goToFavorites) {
+                    // Điều hướng đến trang yêu thích
+                    window.location.href = '/thich'; // Đường dẫn đến trang yêu thích
+                }
+                // Nếu chọn Cancel thì sẽ tự động quay lại trang hiện tại (tiếp tục mua hàng)
+            } else {
+                alert("Sản phẩm này đã có trong danh sách yêu thích");
             }
+        } catch (error) {
+            console.error("Lỗi khi xử lý dữ liệu yêu thích:", error);
+            alert("Đã xảy ra lỗi khi thêm vào danh sách yêu thích.");
+        }
+    }
+};
+ // Kiểm tra xem có dữ liệu người dùng trong localStorage hay không
+ useEffect(() => {
+    // console.log(storedUser);
+    if (storedUser) {
+      // Nếu có thông tin người dùng trong localStorage, set state user
+      setUser(storedUser);
+  
+      // Gửi yêu cầu tới server để lấy thêm dữ liệu người dùng nếu cần
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user); // Cập nhật thông tin người dùng từ server
+          } else {
+            console.error('Lỗi khi lấy thông tin người dùng từ server');
+          }
+        } catch (error) {
+          console.error('Có lỗi xảy ra khi kết nối tới server:', error);
+        }
+      };
+      fetchUserData(); // Gọi hàm lấy dữ liệu người dùng từ server
+    }
+  }, []);
+
+//dat homestay
+const [user, setUser] = useState({
+    ten_user: '',
+    sdt_user: '',
+    email_user: ''
+  });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const bookingData = {
+      ten_user: user.ten_user,
+      sdt_user: user.sdt_user,
+      email_user: user.email_user,
+      checkInDate: checkInDate.toLocaleDateString("en-GB"),
+      checkOutDate: checkOutDate.toLocaleDateString("en-GB"),
+      gia_homestay: homestayCT.gia_homestay
+    };
+         // Kiểm tra các trường hợp hợp lệ trước khi gửi yêu cầu
+        if (bookingData.ten_user.length > 20) {
+            alert('Tên không được quá 20 ký tự.');
             return;
         }
-        if (homestayCT) { // Kiểm tra nếu dữ liệu homestay đã tải
-            try {
-                const existingFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-                
-                // Kiểm tra xem homestay đã có trong danh sách yêu thích chưa
-                const isFavorite = existingFavorites.some(item => item.id_homestay === homestayCT.id_homestay);
-                
-                if (!isFavorite) {
-                    const updatedFavorites = [...existingFavorites, homestayCT];
-                    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-                    
-                    // Hiển thị thông báo với hai lựa chọn
-                    const goToFavorites = window.confirm("Đã thêm vào danh sách yêu thích. Bạn có muốn đi đến trang yêu thích?");
-                    
-                    if (goToFavorites) {
-                        // Điều hướng đến trang yêu thích
-                        window.location.href = '/thich'; // Đường dẫn đến trang yêu thích
-                    }
-                    // Nếu chọn Cancel thì sẽ tự động quay lại trang hiện tại (tiếp tục mua hàng)
-                } else {
-                    alert("Sản phẩm này đã có trong danh sách yêu thích");
-                }
-            } catch (error) {
-                console.error("Lỗi khi xử lý dữ liệu yêu thích:", error);
-                alert("Đã xảy ra lỗi khi thêm vào danh sách yêu thích.");
-            }
-        }
-    };
-    
+    // Kiểm tra số điện thoại
+    const phoneRegex = /^0\d{9}$/; // Chỉ cho phép 10 chữ số cho số điện thoại
+    if (!phoneRegex.test(bookingData.sdt_user)) {
+    alert('Số điện thoại không hợp lệ. Vui lòng nhập lại.');
+    return;
+    }
+
+    // Kiểm tra email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.com$/;
+    if (!emailRegex.test(bookingData.email_user)) {
+    alert('Email không hợp lệ. Vui lòng nhập lại.');
+    return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Đặt phòng thành công');
+        // Làm gì đó sau khi đặt phòng thành công
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Có lỗi xảy ra khi đặt phòng');
+      }
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi gửi yêu cầu:', error);
+      alert('Có lỗi xảy ra, vui lòng thử lại.');
+    }
+  };
     
     if (error) return <p>{error}</p>;
     if (!homestayCT) return <p>Loading...</p>;
-    console.log(localStorage.getItem('favorites'))
     return (
         <div className="layout-c layout-pageProduct">
              {error ? (
@@ -221,7 +315,7 @@ const ChiTiet = () => {
                                                 </div>
                                             </div>
                                            
-                                            <div className="product-variants hidden" style={{ display: 'none' }}>
+                                            {/* <div className="product-variants hidden" style={{ display: 'none' }}>
                                                 <form id="add-item-form" action="" method="post" className="variants clearfix">
                                                     <div className="select clearfix" style={{ display: 'none' }}>
                                                         <select id="product-select" name="id" style={{ display: 'none' }}>
@@ -230,26 +324,57 @@ const ChiTiet = () => {
                                                     </div>
                                                    
                                                 </form>
-                                            </div>
+                                            </div> */}
                                             <div className="form-booking_chitiet">
-                                                <form id="formbooking" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfJOblQa_xzuTB8Gq5HRvzspVC8EEvAUpxcEL_QCYx-3-mx-g/formResponse" data-shop="">
+                                                <form id="formbooking" onSubmit={handleSubmit}>
                                                     <div className="contact-form">
                                                         <div className="row_bth">
                                                             <div className="col-sm-12 col-xs-12">
                                                                 <div className="input-group">
-                                                                    <input required type="text" name="entry.1773600104" id="full_name" data-valid="full_name" className="form-control" placeholder="Tên của bạn" aria-describedby="basic-addon1" />
+                                                                    <input
+                                                                        required
+                                                                        type="text"
+                                                                        name="ten_user" // Đảm bảo tên này khớp với đối tượng `user`
+                                                                        id="full_name"
+                                                                        data-valid="full_name"
+                                                                        className="form-control"
+                                                                        placeholder="Tên của bạn"
+                                                                        value={user.ten_user || ''}
+                                                                        onChange={handleInputChange}
+                                                                        />
                                                                 </div>
                                                                 <p className="full_name-validation field-error"></p>
                                                             </div>
                                                             <div className="col-sm-12 col-xs-12">
                                                                 <div className="input-group">
-                                                                    <input pattern="[0-9]{10,12}" required type="text" name="entry.195991160" id="your_phone" data-valid="your_phone" className="form-control" placeholder="Số điện thoại" aria-describedby="basic-addon1" />
+                                                                <input
+                                                                    pattern="[0-9]{10,12}"
+                                                                    required
+                                                                    type="text"
+                                                                    name="sdt_user" // Tên này cũng khớp với đối tượng `user`
+                                                                    id="your_phone"
+                                                                    data-valid="your_phone"
+                                                                    className="form-control"
+                                                                    placeholder="Số điện thoại"
+                                                                    value={user.sdt_user || ''}
+                                                                    onChange={handleInputChange}
+                                                                    />
                                                                 </div>
                                                                 <p className="your_phone-validation field-error"></p>
                                                             </div>
                                                             <div className="col-sm-12 col-xs-12">
                                                                 <div className="input-group">
-                                                                    <input required type="text" name="entry.597310941" id="your_email" data-valid="your_email" className="form-control" placeholder="Email" aria-describedby="basic-addon1" />
+                                                                <input
+                                                                    required
+                                                                    type="text"
+                                                                    name="email_user" // Tên này cũng khớp với đối tượng `user`
+                                                                    id="your_email"
+                                                                    data-valid="your_email"
+                                                                    className="form-control"
+                                                                    placeholder="Email"
+                                                                    value={user.email_user || ''}
+                                                                    onChange={handleInputChange}
+                                                                    />
                                                                 </div>
                                                                 <p className="your_email-validation field-error"></p>
                                                             </div>

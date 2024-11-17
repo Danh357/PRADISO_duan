@@ -1407,7 +1407,7 @@ span.user-name:hover{
   left: 0;
   width: 100%;
   height: 100%;
-  background: #053f7d91;
+  background: #00000091;
 }
 .row {
   display: flex;
@@ -4639,6 +4639,89 @@ padding:0 15px;
 }
 /* camnag page end */
 /* page userinfo head */
+.error_field_text{
+  color: red;
+}
+.profile-container_infor_nguoidung {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.profile-card_infor_nguoidung {
+  display: flex;
+  align-items: center;
+}
+
+.profile-avatar_infor_nguoidung img {
+  width: 85px;
+  height: auto;
+  border-radius: 5%;
+  object-fit: cover;
+  background-color: red;
+}
+
+.profile-info_infor_nguoidung {
+  margin-left: 20px;
+}
+
+.profile-info_infor_nguoidung h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.profile-info_infor_nguoidung .badge_infor_nguoidung {
+  background-color: #d4edda;
+  color: #155724;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.profile-info_infor_nguoidung p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.profile-actions_infor_nguoidung {
+  display: flex;
+  justify-content: space-around;
+}
+
+.action_infor_nguoidung {
+  text-align: center;
+  flex: 1;
+  border: 1px dashed #ccc;
+  margin: 0 10px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.action_infor_nguoidung:hover {
+  border-color: #007bff;
+  background-color: #f1f9ff;
+}
+
+.action_infor_nguoidung .icon_infor_nguoidung {
+  font-size: 24px;
+  color: #555;
+}
+
+.action_infor_nguoidung p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.action_infor_nguoidung .count_infor_nguoidung {
+  font-weight: bold;
+  font-size: 16px;
+  color: #007bff;
+}
 .body_profile {
   margin-top: 70px;
   margin-bottom: 32px;
@@ -4663,6 +4746,7 @@ padding:0 15px;
   align-items: start;
   width: 100%;
   gap: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 .box_user .main_title {
   font-size: 32px;
@@ -4730,7 +4814,7 @@ padding:0 15px;
 .tab_item.active,
 .tab_item button:hover,
 .tab_item:hover {
-  color: var(--hover);
+  color: var(--shop-home-service-bg);
 }
 .tab_item button {
   background-color: transparent;
@@ -4748,19 +4832,19 @@ padding:0 15px;
   border-bottom: 2px solid #e2e2e2;
 }
 .box_tieude h1 {
-  color: var(--hover);
+  color: var(--shop-home-service-bg);
   font-size: 18px;
 }
 .to_capnhat {
   padding: 8px 15px;
-  background-color: var(--hover);
+  background-color: var(--shop-home-service-bg);
   color: #fff;
   border-radius: 4px;
 }
 .to_capnhat:hover {
   background-color: #fff;
-  color: var(--hover);
-  border: 1px solid var(--hover);
+  color: var(--shop-home-service-bg);
+  border: 1px solid var(--shop-home-service-bg);
 }
 .content_tt {
   width: 100%;
@@ -4841,7 +4925,7 @@ border: 1px solid #ebebeb;
   min-height: 50px;
   border-radius: 4px;
   font-size: 20px;
-  background-color: var(--lightgreen);
+  background-color: var(--shop-home-service-bg);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -4859,13 +4943,13 @@ border: 1px solid #ebebeb;
 .form_repass button {
   padding: 15px 0;
   border: none;
-  background-color: var(--lightgreen);
+  background-color: var(--shop-home-service-bg);
   color: #fff;
   font-size: 20px;
   transition: 0.3s;
 }
 .form_repass button:hover {
-  background-color: var(--darkgreen);
+  background-color: var(--shop-home-service-bg);
 }
 .table_cart {
   width: 100%;
@@ -5352,12 +5436,13 @@ border: 1px solid #ebebeb;
   overflow-y: auto;
 }
 .danhgia-list::-webkit-scrollbar {
-  width: 5px; /* Chiều rộng của thanh cuộn dọc */
+  width: 10px; /* Chiều rộng của thanh cuộn dọc */
   height: 3px; /* Chiều cao của thanh cuộn ngang */
 }
 .danhgia-list::-webkit-scrollbar-thumb {
-  background-color: #c9c9c9; /* Màu của thanh cuộn */
-  border-radius: 10px; /* Góc bo tròn cho thanh cuộn */
+  cursor: pointer;
+  background-color: #05407D; /* Màu của thanh cuộn */
+  border-radius: 5px; /* Góc bo tròn cho thanh cuộn */
 }
 .location-danhgia{
   /* background-image: url(/public/image/bando1.png); */
@@ -5481,7 +5566,9 @@ border: 1px solid #ebebeb;
 }
 .full-width:hover{
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-
+}
+.count{
+  margin-bottom: 10px;
 }
 /* danh gia page end */
 

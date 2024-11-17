@@ -6,7 +6,6 @@ function Infor_User_Qmk() {
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem('auth'));
 
-
   // Kiểm tra xem có dữ liệu người dùng trong localStorage hay không
   useEffect(() => {
     console.log(storedUser);
@@ -57,63 +56,137 @@ function Infor_User_Qmk() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [errorOldPassword, setErrorOldPassword] = useState("");
+  const [errorNewPassword, setErrorNewPassword] = useState("");
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
   const [message, setMessage] = useState('');
   
   // Lấy id_user từ localStorage (hoặc từ state nếu có)
   console.log(storedUser);
-  
-  
-  // Hàm xử lý gửi form để thay đổi mật khẩu
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    // Reset lỗi
+    setErrorOldPassword("");
+    setErrorNewPassword("");
+    setErrorConfirmPassword("");
+    setMessage("");
+
+    let hasError = false;
+
     // Kiểm tra dữ liệu đầu vào
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setError('Vui lòng cung cấp đầy đủ thông tin.');
-      return;
+    if (!oldPassword) {
+      setErrorOldPassword("Vui lòng nhập mật khẩu cũ.");
+      hasError = true;
     }
-  
-    if (newPassword !== confirmPassword) {
-      setError('Mật khẩu mới và mật khẩu nhập lại không khớp.');
-      return;
+
+    if (!newPassword) {
+      setErrorNewPassword("Vui lòng nhập mật khẩu mới.");
+      hasError = true;
+    } else if (newPassword.length < 6) {
+      setErrorNewPassword("Mật khẩu mới phải có ít nhất 6 ký tự.");
+      hasError = true;
     }
-  
+
+    if (!confirmPassword) {
+      setErrorConfirmPassword("Vui lòng nhập lại mật khẩu mới.");
+      hasError = true;
+    } else if (newPassword !== confirmPassword) {
+      setErrorConfirmPassword("Mật khẩu mới và mật khẩu nhập lại không khớp.");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     try {
-      // Gửi yêu cầu thay đổi mật khẩu đến backend sử dụng fetch
-      const response = await fetch(`http://localhost:3000/change-password/${storedUser.id_user}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          old_password: oldPassword,
-          new_password: newPassword,
-          confirm_password: confirmPassword,
-        }),
-      });
-  
-      // Kiểm tra phản hồi từ server
+      // Gửi yêu cầu tới API
+      const response = await fetch(
+        `http://localhost:3000/change-password/${storedUser.id_user}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            old_password: oldPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword,
+          }),
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
-        setMessage(data.message || 'Đổi mật khẩu thành công!');
-        setError(''); // Xóa lỗi cũ nếu có
+        window.alert(data.message || "Đổi mật khẩu thành công!");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Có lỗi xảy ra khi thay đổi mật khẩu.');
-        setMessage(''); // Xóa thông báo thành công nếu có
+
+        // Hiển thị lỗi từ server
+        if (errorData.message === "Mật khẩu cũ không chính xác.") {
+          setErrorOldPassword(errorData.message);
+        } else if (errorData.message === "Mật khẩu mới và mật khẩu nhập lại không khớp.") {
+          setErrorConfirmPassword(errorData.message);
+        } else {
+          setMessage("");
+        }
       }
     } catch (err) {
-      // Xử lý lỗi kết nối
-      setError('Không thể kết nối tới server.');
-      setMessage(''); // Xóa thông báo thành công nếu có
+      setMessage("Không thể kết nối tới server.");
     }
   };
+  // Hàm xử lý gửi form để thay đổi mật khẩu
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  
+  //   // Kiểm tra dữ liệu đầu vào
+  //   if (!oldPassword || !newPassword || !confirmPassword) {
+  //     setError('Vui lòng cung cấp đầy đủ thông tin.');
+  //     return;
+  //   }
+  
+  //   if (newPassword !== confirmPassword) {
+  //     setError('Mật khẩu mới và mật khẩu nhập lại không khớp.');
+  //     return;
+  //   }
+  
+  //   try {
+  //     // Gửi yêu cầu thay đổi mật khẩu đến backend sử dụng fetch
+  //     const response = await fetch(`http://localhost:3000/change-password/${storedUser.id_user}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         old_password: oldPassword,
+  //         new_password: newPassword,
+  //         confirm_password: confirmPassword,
+  //       }),
+  //     });
+  
+  //     // Kiểm tra phản hồi từ server
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setMessage(data.message || 'Đổi mật khẩu thành công!');
+  //       setError(''); // Xóa lỗi cũ nếu có
+  //     } else {
+  //       const errorData = await response.json();
+  //       setError(errorData.message || 'Có lỗi xảy ra khi thay đổi mật khẩu.');
+  //       setMessage(''); // Xóa thông báo thành công nếu có
+  //     }
+  //   } catch (err) {
+  //     // Xử lý lỗi kết nối
+  //     setError('Không thể kết nối tới server.');
+  //     setMessage(''); // Xóa thông báo thành công nếu có
+  //   }
+  // };
 
   if (!user) {
     // Nếu không có người dùng, có thể hiển thị trang đăng nhập hoặc thông báo khác
     return <div>Chưa đăng nhập. Vui lòng đăng nhập lại.</div>;
   }
-
   return (
     <div className="main">
       <div className="danh">123</div>
@@ -121,7 +194,18 @@ function Infor_User_Qmk() {
         <div className="main_tk">
           <div className="thongtin">
             <div className="box_user">
-              <div className="main_title">Xin Chào <span className="primary">{user.ten_user}</span></div>
+                 <div className="profile-container_infor_nguoidung">
+                      <div className="profile-card_infor_nguoidung">
+                          <div className="profile-avatar_infor_nguoidung">
+                              <img src="../../image/user2.png" alt="Avatar"/>
+                          </div>
+                          <div className="profile-info_infor_nguoidung">
+                              <h2>{user.id_user}. {user.ten_user}</h2>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-envelope"></i></span>  {user.email_user}</p>
+                          </div>
+                      </div>
+                </div>
             </div>
             <div className="box_link">
               <Link to={'/infor_user'} className="tab_item active">
@@ -149,22 +233,21 @@ function Infor_User_Qmk() {
               <input type="password" id="old_pass" name="old_pass" 
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}/>
-              <p className="error_field_text">Thông báo lỗi mật khẩu cũ</p>
+                 <p className="error_field_text">{errorOldPassword}</p>
 
               <label htmlFor="new_pass">Mật khẩu mới <span className="require">*</span></label>
               <input type="password" id="new_pass" name="new_pass"  value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}/>
-              <p className="error_field_text">Thông báo lỗi mật khẩu mới</p>
+             <p className="error_field_text">{errorNewPassword}</p>
 
               <label htmlFor="new_pass_again">Nhập lại mật khẩu mới <span className="require">*</span></label>
               <input type="password" id="new_pass_again" name="new_pass_again"  value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}/>
-              <p className="error_field_text">Thông báo lỗi nhập lại mật khẩu</p>
+             <p className="error_field_text">{errorConfirmPassword}</p>
 
               <button type="submit" name="doimatkhau" value="Đặt lại mật khẩu" className="btn btn-primary btn-style btn-login">Đặt lại mật khẩu mới</button>
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {message && <p style={{ color: 'green' }}>{message}</p>}
+            <br />
           </div>
           <div className="tab">
             <h1 className="tab_title">Tài khoản</h1>

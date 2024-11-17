@@ -32,7 +32,7 @@ const Phong = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log(data); // Log dữ liệu nhận được
+      // console.log(data); // Log dữ liệu nhận được
       setImages(data); // Đặt dữ liệu vào state
     } catch (error) {
       console.error('Failed to fetch images:', error);

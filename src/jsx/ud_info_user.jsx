@@ -7,8 +7,6 @@ function Ud_Infor_User() {
   const [message] = useState("");
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem('auth'));
-  // console.log(user);
-  // console.log(storedUser);
   
   // Hàm đăng xuất
   const handleLogout = () => {
@@ -41,7 +39,7 @@ function Ud_Infor_User() {
               'Content-Type': 'application/json',
             },
           });
-
+          
           if (response.ok) {
             const data = await response.json();
             setUser(data.user); // Cập nhật thông tin người dùng từ server
@@ -59,7 +57,6 @@ function Ud_Infor_User() {
   //update info
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     // Kiểm tra thông tin người dùng trong localStorage
   
     // Nếu không có thông tin người dùng trong localStorage, dừng lại
@@ -79,6 +76,25 @@ function Ud_Infor_User() {
       gender: user?.gender || storedUser?.gender || '',
       dob: user?.dob || storedUser?.dob || '',
     };
+     // Kiểm tra các trường hợp hợp lệ trước khi gửi yêu cầu
+  if (updatedUser.ten_user.length > 16) {
+    alert('Tên không được quá 16 ký tự.');
+    return;
+  }
+
+  // Kiểm tra số điện thoại
+  const phoneRegex = /^0\d{9}$/; // Chỉ cho phép 10 chữ số cho số điện thoại
+  if (!phoneRegex.test(updatedUser.sdt_user)) {
+    alert('Số điện thoại không hợp lệ. Vui lòng nhập lại.');
+    return;
+  }
+
+  // Kiểm tra email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.com$/;
+  if (!emailRegex.test(updatedUser.email_user)) {
+    alert('Email không hợp lệ. Vui lòng nhập lại.');
+    return;
+  }
   
     try {
       const response = await fetch(`http://localhost:3000/user/${id_user}`, {
@@ -94,6 +110,7 @@ function Ud_Infor_User() {
         alert('Cập nhật thông tin thành công');
         // Cập nhật lại thông tin người dùng trong ứng dụng (state hoặc localStorage)
         localStorage.setItem('auth', JSON.stringify(updatedUser)); // Cập nhật lại localStorage nếu cần
+        window.location.reload();
       } else {
         alert(data.thongbao || 'Có lỗi xảy ra');
       }
@@ -112,6 +129,19 @@ function Ud_Infor_User() {
     }));
   };
 
+// Chuyển đổi ngày sinh về định dạng yyyy-mm-dd
+  const formatDate = (date) => {
+    // Kiểm tra xem date có hợp lệ không
+    if (!date) return '';
+    
+    const localDate = new Date(date);
+    // Chuyển đổi thành định dạng yyyy-mm-dd
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');  // Thêm 1 vì tháng bắt đầu từ 0
+    const day = String(localDate.getDate()).padStart(2, '0'); // Đảm bảo ngày có 2 chữ số
+    
+    return `${year}-${month}-${day}`;
+  };
 
 
   if (!user) {
@@ -125,7 +155,18 @@ function Ud_Infor_User() {
         <div className="main_tk">
           <div className="thongtin">
             <div className="box_user">
-              <div className="main_title">Xin Chào <span className="primary">{user.ten_user}</span></div>
+                <div className="profile-container_infor_nguoidung">
+                      <div className="profile-card_infor_nguoidung">
+                          <div className="profile-avatar_infor_nguoidung">
+                              <img src="../../image/user2.png" alt="Avatar"/>
+                          </div>
+                          <div className="profile-info_infor_nguoidung">
+                              <h2>{user.id_user}. {user.ten_user}</h2>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-envelope"></i></span>  {user.email_user}</p>
+                          </div>
+                      </div>
+                </div>
             </div>
             <div className="box_link">
               <Link to={'/infor_user'} className="tab_item active">
@@ -200,7 +241,7 @@ function Ud_Infor_User() {
                     name="dob"
                     id="ngaysinh"
                     placeholder="Ngày Sinh"
-                    value={user.dob || ''}
+                    value={user.dob ? formatDate(user.dob) : ''}  // Chuyển đổi ngày sinh về định dạng yyyy-mm-dd
                     onChange={handleInputChange}
                   />
                 </div>

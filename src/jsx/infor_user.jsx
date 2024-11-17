@@ -63,7 +63,19 @@ function Infor_User() {
         <div className="main_tk">
           <div className="thongtin">
             <div className="box_user">
-              <div className="main_title">Xin Chào <span className="primary">{user.ten_user}</span></div>
+                <div className="profile-container_infor_nguoidung">
+                      <div className="profile-card_infor_nguoidung">
+                          <div className="profile-avatar_infor_nguoidung">
+                              <img src="../../image/user2.png" alt="Avatar"/>
+                          </div>
+                          <div className="profile-info_infor_nguoidung">
+                              <h2>{user.id_user}. {user.ten_user}</h2>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
+                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-envelope"></i></span>  {user.email_user}</p>
+                          </div>
+                      </div>
+                </div>
+                {/* <div className="main_title">Xin Chào <span className="primary">{user.ten_user}</span></div> */}
             </div>
             <div className="box_link">
               <Link to={'/infor_user'} className="tab_item active">
@@ -107,6 +119,7 @@ function Infor_User() {
                 </div>
               </div>
             </div>
+
           </div>
           <div className="tab">
             <h1 className="tab_title">Tài Khoản</h1>
@@ -133,6 +146,7 @@ function Infor_User() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

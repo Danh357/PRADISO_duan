@@ -17,6 +17,7 @@ const Lienhe = () => {
       setUser(storedUser);
       setName(storedUser.ten_user || ''); // Set giá trị mặc định nếu name không tồn tại
       setEmail(storedUser.email_user || '');
+      
     }
   }, []); // Chỉ chạy một lần khi component render
 

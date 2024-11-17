@@ -146,7 +146,7 @@ function Header() {
                                    <img
                                         id="menuButton"
                                         onClick={toggleDropdown}
-                                        src={user.image || '../../image/user_md.png'}
+                                        src={user.image || '../../image/user2.png'}
                                         alt="User"
                                         className="user-image"
                                     />
