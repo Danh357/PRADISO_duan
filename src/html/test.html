@@ -1,88 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Navigation with Active Line</title>
-  <style>
-    /* Reset và định dạng cơ bản */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Không tìm thấy trang</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
 
-    header {
-      background-color: #333;
-      padding: 10px 20px;
-    }
+        .container {
+            padding: 50px 20px;
+        }
 
-    .navbar {
-      display: flex;
-      justify-content: center;
-    }
+        .error-image img {
+            width: 150px;
+            height: auto;
+        }
 
-    .nav-item {
-      position: relative;
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 18px;
-      transition: color 0.3s ease;
-    }
+        h1 {
+            font-size: 120px;
+            color: #17a2b8;
+            margin: 20px 0;
+        }
 
-    .nav-item:hover {
-      color: #00bcd4; /* Màu chữ khi hover */
-    }
+        p {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
 
-    /* Line hiệu ứng */
-    .nav-item::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background-color: #00bcd4; /* Line màu xanh */
-      transition: width 0.3s ease;
-    }
+        .home-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #28a745;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
 
-    .nav-item:hover::after {
-      width: 100%; /* Line kéo dài toàn bộ */
-    }
-
-    /* Hiệu ứng cho trang hiện tại */
-    .nav-item.active {
-      color: #00bcd4; /* Màu chữ của mục hiện tại */
-    }
-
-    .nav-item.active::after {
-      width: 100%; /* Line dưới chữ mục hiện tại */
-    }
-  </style>
+        .home-button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <nav class="navbar">
-      <a href="index.html" class="nav-item">Home</a>
-      <a href="about.html" class="nav-item">About</a>
-      <a href="services.html" class="nav-item">Services</a>
-      <a href="contact.html" class="nav-item">Contact</a>
-    </nav>
-  </header>
-
-  <script>
-    // JavaScript để tự động thêm lớp "active" vào mục menu hiện tại
-    const currentLocation = window.location.href; // Lấy URL hiện tại
-    const menuItems = document.querySelectorAll('.nav-item');
-
-    menuItems.forEach(item => {
-      if (item.href === currentLocation) {
-        item.classList.add('active'); // Thêm class "active" nếu URL khớp
-      }
-    });
-  </script>
+    <div class="container">
+        <div class="error-image">
+            <!-- Thay thế đường dẫn src này bằng ảnh minh họa của bạn -->
+            <img src="https://via.placeholder.com/150" alt="Magnifying Glass">
+        </div>
+        <h1>404</h1>
+        <p>Có gì đó không ổn... Không tìm thấy trang</p>
+        <p>Đã xảy ra lỗi, trang web được hiển thị cho người dùng khi máy chủ không thể tìm thấy trang được yêu cầu.</p>
+        <a href="/" class="home-button">Trở về trang chủ</a>
+    </div>
 </body>
 </html>

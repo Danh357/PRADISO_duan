@@ -1,6 +1,5 @@
 import React, { useState,useEffect } from 'react';
-// import { useParams } from "react-router-dom"
-// import { useDispatch } from "react-redux";
+import { Swiper, SwiperSlide } from 'swiper/react';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,6 +10,8 @@ const ChiTiet = () => {
     const [checkOutDate, setCheckOutDate] = useState(new Date("2024-10-23"));
 
     const { id } = useParams();
+    const [user, setUser] = useState(null);
+    const storedUser = JSON.parse(localStorage.getItem('auth'));
     const [homestayCT, setHomestay] = useState(null);
     const [error, setError] = useState(null);
     const [rooms, setRooms] = useState([]);
@@ -63,8 +64,47 @@ const ChiTiet = () => {
         };
         fetchRooms();
       }, [id]);
+///kiemtra dang nhap mmoiws được yêu thích
+      useEffect(() => {
+        if (!storedUser) {
+            console.log("Người dùng chưa đăng nhập.");
+            // Nếu cần, có thể tự động điều hướng đến trang đăng nhập:
+            // window.location.href = '/login';
+        } else {
+            setUser(storedUser);
+            // Gửi yêu cầu tới server để lấy thêm dữ liệu người dùng nếu cần
+            const fetchUserData = async () => {
+                try {
+                    const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+    
+                    if (response.ok) {
+                        const data = await response.json();
+                        setUser(data.user); // Cập nhật thông tin người dùng từ server
+                    } else {
+                        console.error('Lỗi khi lấy thông tin người dùng từ server');
+                    }
+                } catch (error) {
+                    console.error('Có lỗi xảy ra khi kết nối tới server:', error);
+                }
+            };
+            fetchUserData();
+        }
+    }, [storedUser]);
       
       const addToFavorites = () => {
+        if (!storedUser) {
+            // Nếu chưa đăng nhập, hiển thị thông báo và điều hướng đến trang đăng nhập
+            const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
+            if (goToLogin) {
+                window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+            }
+            return;
+        }
         if (homestayCT) { // Kiểm tra nếu dữ liệu homestay đã tải
             try {
                 const existingFavorites = JSON.parse(localStorage.getItem('favorites')) || [];

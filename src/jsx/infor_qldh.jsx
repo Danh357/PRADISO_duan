@@ -4,24 +4,53 @@ import { Link, useNavigate } from 'react-router-dom';
 function Infor_User_Qldh() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem('auth'));
 
   // Kiểm tra xem có dữ liệu người dùng trong localStorage hay không
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('auth'));
+    console.log(storedUser);
     if (storedUser) {
-      setUser(storedUser); // Lưu thông tin người dùng vào state
+      // Nếu có thông tin người dùng trong localStorage, set state user
+      setUser(storedUser);
+
+      // Gửi yêu cầu tới server để lấy thêm dữ liệu người dùng nếu cần
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user); // Cập nhật thông tin người dùng từ server
+          } else {
+            console.error('Lỗi khi lấy thông tin người dùng từ server');
+          }
+        } catch (error) {
+          console.error('Có lỗi xảy ra khi kết nối tới server:', error);
+        }
+      };
+      fetchUserData(); // Gọi hàm lấy dữ liệu người dùng từ server
     }
   }, []);
 
   // Hàm đăng xuất
   const handleLogout = () => {
-    // Xóa thông tin người dùng khi đăng xuất
-    localStorage.removeItem('auth');
-    setUser(null); // Đặt lại state user về null
-
-    // Điều hướng người dùng về trang đăng nhập hoặc trang chủ
-    navigate('/'); 
-    window.location.reload(); // Điều hướng về trang chủ (hoặc trang đăng nhập '/login')
+    // Hiển thị thông báo xác nhận
+    const isConfirmed = window.confirm('Bạn có chắc chắn muốn đăng xuất không?');
+    
+    if (isConfirmed) {
+      // Xóa thông tin người dùng khi đăng xuất
+      localStorage.removeItem('auth');
+      setUser(null); // Đặt lại state user về null
+  
+      // Điều hướng người dùng về trang đăng nhập hoặc trang chủ
+      navigate('/');
+      window.location.reload(); // Tải lại trang
+    }
   };
 
   if (!user) {
@@ -36,7 +65,7 @@ function Infor_User_Qldh() {
         <div className="main_tk">
           <div className="thongtin">
             <div className="box_user">
-              <div className="main_title">Xin Chào <span className="primary">{user.name}</span></div>
+              <div className="main_title">Xin Chào <span className="primary">{user.ten_user}</span></div>
             </div>
             <div className="box_link">
               <Link to={'/infor_user'} className="tab_item active">
@@ -63,7 +92,7 @@ function Infor_User_Qldh() {
               <thead>
                 <tr>
                   <th>Thứ Tự</th>
-                  <th>Thông Tin Sản Phẩm</th>
+                  <th>Thông Tin Đơn Hàng</th>
                   <th>Số Lượng</th>
                   <th>Tổng Tiền</th>
                   <th>Trạng Thái</th>
@@ -81,7 +110,7 @@ function Infor_User_Qldh() {
                   <td>Số Lượng</td>
                   <td className="price_tk">Tổng Tiền đ</td>
                   <td>Chờ</td>
-                  <td><a href="print_donhang/ID.htm" target="_blank"><img src="imgs/admin/in.png" className="icon_btn" /></a></td>
+                  <td><p className='icon' target="_blank"><i class="fa-solid fa-trash"></i></p></td>
                 </tr>
                 {/* <!-- Repeat rows as needed --> */}
               </tbody>

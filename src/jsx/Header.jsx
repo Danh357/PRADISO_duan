@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
 function Header() {
     const [active, setActive] = useState(false);
-    const [active1, setActive1] = useState(false);
-    const [active2, setActive2] = useState(false);
-    const [active3, setActive3] = useState(false);
+    // const [active1, setActive1] = useState(false);
+    // const [active2, setActive2] = useState(false);
+    // const [active3, setActive3] = useState(false);
     // uuuser
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
     const [showDropdown, setShowDropdown] = useState(false);
@@ -201,72 +201,54 @@ function Header() {
                         {/* <!-- slidebar mobile --> */}
                         <div className="sidebar_mobile">
                             <label  htmlFor="click_open_close" className="x_sdide_bar"><i className="fa-sharp fa-regular fa-x"></i></label>
-                            <div className="logo_mb">
+                            <div className="logo_mb" onClick={handleLogoClick}>
                                 <Link to="/">
-                                    <img src="/image/Logo.png" alt="Logo PARADICO"/>
+                                    <img src="/image/Logo.png" alt="Logo Paradiso"/>
                                 </Link>
                             </div>
                             <div className="dkdn_mb">
-                                <p className="t_dkdn_mb">Đăng nhập để hưởng những đặc quyền dành riêng cho thành viên.</p>
-                                <a href="#">Đăng nhập &amp; Đăng ký</a>
+                            {isLoggedIn ? (
+                                    <p onClick={handleLogoClick} className="t_dkdn_mb"><Link to={'/infor_user'} >Chào {user?.ten_user}!</Link></p>
+                                ) : (
+                                    <p className="t_dkdn_mb">Đăng nhập để hưởng những đặc quyền dành riêng cho thành viên.</p>
+                                )}
+                                {!isLoggedIn && <Link to={'/dk_dn'}>Đăng nhập &amp; Đăng ký</Link>}
                             </div>
                             <div className="wap_menu_mobile"> 
                                 <ul className="menu_mobile">
-                                    <li><a href="./index.html" className="active" >Trang chủ</a></li>
+                                    <li onClick={handleLogoClick} ><Link to={'/'} className="active" >Trang chủ</Link></li>
                                     <li className="has-submenu">
-                                        <a href="#" className={"submenu-toggle" + (active ? ' active' : '')} >Về Paradico <span onClick={() => setActive(!active)}><i className="fa-light fa-chevron-down"></i></span></a>
+                                        <Link to={''} className={"submenu-toggle" + (active ? ' active' : '')} >Về Paradico <span onClick={() => setActive(!active)}><i className="fa-light fa-chevron-down"></i></span></Link>
                                         <ul className={"submenu_mobile" + (active ? ' active' : '')}>
-                                            <li><a href="XXXX">blabla</a></li>
+                                            <li><Link to={''}>lịch sử ra đời</Link></li>
                                         </ul>
                                     </li>
-                                    <li><a href="XXXX">Phòng</a></li>
-                                    <li className="has-submenu">
-                                        <a href="#" className={"submenu-toggle" + (active1 ? ' active' : '')} >Dịch vụ tại Paradico <span onClick={() => setActive1(!active1)}><i className="fa-light fa-chevron-down"></i></span></a>
-                                        <ul className={"submenu_mobile" + (active1 ? ' active' : '')}>
-                                            <li><a href="./dvkd_map.html">Đơn vị kinh doanh Map</a></li>
-                                            <li><a href="./dvkd_navi.html">Đơn vị kinh doanh Navigation</a></li>
-                                            <li><a href="./dvkd_tracking.html">Đơn vị kinh doanh Tracking</a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="has-submenu">
-                                        <a href="#" className={"submenu-toggle" + (active2 ? ' active' : '')} >Cẩm nang du lịch <span onClick={() => setActive2(!active2)}><i className="fa-light fa-chevron-down"></i></span></a>
-                                        <ul className={"submenu_mobile" + (active2 ? ' active' : '')}>
-                                            <li><a href="./dvkd_map.html">Đơn vị kinh doanh Map</a></li>
-                                            <li><a href="./dvkd_navi.html">Đơn vị kinh doanh Navigation</a></li>
-                                            <li><a href="./dvkd_tracking.html">Đơn vị kinh doanh Tracking</a></li>
-                                        </ul>
-                                    </li>
-                                    <li className="has-submenu">
-                                        <a href="#" className={"submenu-toggle" + (active3 ? ' active' : '')} >Giới thiệu <span onClick={() => setActive3(!active3)}><i className="fa-light fa-chevron-down"></i></span></a>
-                                        <ul className={"submenu_mobile" + (active3 ? ' active' : '')}>
-                                            <li><a href="./dvkd_map.html">Đơn vị kinh doanh Map</a></li>
-                                            <li><a href="./dvkd_navi.html">Đơn vị kinh doanh Navigation</a></li>
-                                            <li><a href="./dvkd_tracking.html">Đơn vị kinh doanh Tracking</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <li><a href="./Lien_he.html">Liên hệ</a></li>
+                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Phòng</Link></li>
+                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Dịch vụ</Link></li>
+                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Cẩm nang du lịch</Link></li>
+                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Giới thiệu</Link></li>
+                                    <li onClick={handleLogoClick}><Link to={'/lienhe'}>Liên hệ</Link></li>
                                 </ul>
                                 <ul className="list_social_rwd">
                                     <li>
-                                        <a href="#">
+                                        <Link to={''}>
                                             <i className="fa-brands fa-facebook-f"></i>
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
-                                        <a href="#">
+                                        <Link to={''}>
                                             <i className="fa-brands fa-x-twitter"></i>
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
-                                        <a href="#">
+                                        <Link to={''}>
                                             <i className="fa-brands fa-square-instagram"></i>
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
-                                        <a href="#">
+                                        <Link to={''}>
                                             <i className="fa-brands fa-youtube"></i>
-                                        </a>
+                                        </Link>
                                     </li>
                                 </ul>
                             </div>

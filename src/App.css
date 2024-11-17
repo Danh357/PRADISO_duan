@@ -1189,6 +1189,34 @@ span.user-name:hover{
   margin-top: 50px;
   text-align: center;
 }
+/* hehee */
+#app {
+  height: 100%;
+}
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* hehe */
 /* footer_inta */
 /* spa & masge */
 .about_tittle{
@@ -4610,7 +4638,7 @@ padding:0 15px;
   margin-top: 20px;
 }
 /* camnag page end */
-/* page user head */
+/* page userinfo head */
 .body_profile {
   margin-top: 70px;
   margin-bottom: 32px;
@@ -4854,7 +4882,11 @@ border: 1px solid #ebebeb;
   border: 1px solid #ebebeb;
   color: #1c1c1c;
 }
-/* page user end */
+.icon{
+  color: #000;
+  margin: 0;
+}
+/* page userinfo end */
 /* page dịch vụ haed  */
 .page_dv-services-menu {
   margin-top: 60px;
@@ -5102,7 +5134,7 @@ border: 1px solid #ebebeb;
 }
 
 .overlay_dk_dn {
-  background: #ff416c;
+  /* background: #ff416c; */
   /* background: linear-gradient(to right, #ff4b2b, #ff416c); */
   color: #fff;
   background-image: url(/public/image/banner_login.jpg);
@@ -5451,11 +5483,72 @@ border: 1px solid #ebebeb;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 
 }
-
 /* danh gia page end */
 
+/* not found page head */
+.not-found-container {
+  text-align: center;
+  padding: 50px 20px;
+}
 
+.not-found-title {
+  font-size: 100px;
+  color: rgb(0 150 136);
+  margin: 0;
+}
 
+.not-found-image {
+  width: 300px;
+  height: auto;
+  margin: 20px 0;
+}
+
+.not-found-text {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 30px;
+}
+.not-found-button {
+  text-decoration: none;
+  background-color: #05407D;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+.not-found-button:hover {
+  background-color: #ff6b6b;
+}
+@media (min-width: 768px) {
+  .not-found-title {
+    font-size: 3vw; /* Giảm kích thước chữ cho màn hình lớn hơn */
+  }
+
+  .not-found-text {
+    font-size: 16px; /* Ổn định kích thước chữ trên tablet và màn hình lớn */
+  }
+
+  .not-found-button {
+    font-size: 16px; /* Ổn định kích thước nút trên màn hình lớn */
+  }
+}
+
+@media (min-width: 1200px) {
+  .not-found-title {
+    font-size: 72px; /* Kích thước tiêu đề lớn hơn cho màn hình rất lớn */
+  }
+
+  .not-found-text {
+    font-size: 18px; /* Văn bản dễ đọc hơn trên desktop */
+  }
+
+  .not-found-button {
+    padding: 12px 24px; /* Thêm khoảng đệm cho nút trên màn hình lớn */
+    font-size: 18px;
+  }
+}
+/* not found page end */
 
 
 /* loading trang web head */
@@ -9837,6 +9930,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 /* thanh tìm homestay end */
 /* page phong head */
+.banner.phong {
+  height: 45vh;
+}
 .section-breadcrumb, .col-banner {
   padding: 50px;
 }

@@ -447,6 +447,8 @@ useEffect(() => {
                   />
               </div>
             </div>
+            
+            
           </section>
           <section className="section-collection-about-2"style={{"--bg-col-all":" url(//theme.hstatic.net/200000909393/1001269498/14/collection_about_2_banner.jpg?v=2537)"}}>
             <div className="container_homelist">
@@ -483,6 +485,67 @@ useEffect(() => {
               </div>
             </div>
           </section>
+{/* // <!-- form email --> */}
+          <div className="email_newletter" data-aos="fade-up" data-aos-duration="1000" >
+                    <div className="min_warp2">
+                        <div className="row_email">
+                            <div className="col-lg-6 col-12">
+                                <div className="newsletter_title">
+                                    <div className="heading-title">
+                                        <p className="title3">Hãy kết nối cùng Paradiso</p>
+                                        <h3 className="title4">Đăng ký nhận bản tin của chúng tôi để nhận tin tức, ưu đãi và khuyến mãi.</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-lg-6 col-12">
+                                <form acceptCharset="UTF-8" action="#" className="contact_form" method="post">
+                                    <input name="form_type" type="hidden" value="customer"/>
+                                    <input name="utf8" type="hidden" value="✓"/>
+                                    <div className="form-group input-group">
+                                        <input type="hidden" id="new_tags" name="#" value="Đăng kí nhận tin"/>     
+                                        <input required="" type="email" name="#" className="form-control newsletter-input" id="newsletter-email" pattern="^(.)+@[A-Za-z0-9]([A-Za-z0-9.\-]*[A-Za-z0-9])?\.[A-Za-z]{1,13}$" placeholder="Nhập email của bạn" aria-label="Email Address"/>
+                                        <div className="input_btn">
+                                            <button type="submit" className="cta-submitform newsletter-btn">Đăng ký 
+                                                <span className="icon-btn"><i className="fa fa-send-o"></i></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="check-form">
+                                        <input type="checkbox" id="new_check" required=""/>
+                                        <span>Đã đọc &amp; Đồng ý <a href="#"> & Chính sách bảo mật</a></span>
+                                    </div>
+                                    <input id="eb66e25e0d524d97a7478759b2b7d91e" name="g-recaptcha-response" type="hidden"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+{/* /* <!-- form email --> */}
+{/* <!-- footer-intagram --> */}
+            <div className="footer-instagram" data-aos="fade-zoom-in" data-aos-easing="ease-in-out"data-aos-delay="400" data-aos-offset="0">
+                  <div className="min_warp2">                     
+                      <div className="row_col">
+                          <div className="box_intagram">
+                              <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
+                          </div>   
+                          <div className="box_intagram">
+                              <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_2.jpg?v=2537" alt="Instgram 2"/>
+                          </div>            
+                          <div className="box_intagram">
+                              <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_3.jpg?v=2537" alt="Instgram 3"/>
+                          </div>           
+                          <div className="box_intagram">
+                              <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_4.jpg?v=2537" alt="Instgram 4"/>
+                          </div>           
+                      </div>
+                      <div className="btn-more text-center">
+                          <a href="#"><button className="ocean-button" id="oceanButton"><i className="fa-brands fa-instagram"></i> Theo dõi trên Instagram</button></a>
+                      </div>
+                  </div>
+            </div>
+{/* <!-- footer-intagram --> */}
+             
+                    
         </div>
       </section>
     </main>

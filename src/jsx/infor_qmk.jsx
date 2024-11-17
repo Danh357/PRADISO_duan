@@ -38,15 +38,19 @@ function Infor_User_Qmk() {
     }
   }, []);
 
-  // Hàm đăng xuất
   const handleLogout = () => {
-    // Xóa thông tin người dùng khi đăng xuất
-    localStorage.removeItem('auth');
-    setUser(null); // Đặt lại state user về null
-
-    // Điều hướng người dùng về trang đăng nhập hoặc trang chủ
-    navigate('/'); 
-    window.location.reload(); // Điều hướng về trang chủ (hoặc trang đăng nhập '/login')
+    // Hiển thị thông báo xác nhận
+    const isConfirmed = window.confirm('Bạn có chắc chắn muốn đăng xuất không?');
+    
+    if (isConfirmed) {
+      // Xóa thông tin người dùng khi đăng xuất
+      localStorage.removeItem('auth');
+      setUser(null); // Đặt lại state user về null
+  
+      // Điều hướng người dùng về trang đăng nhập hoặc trang chủ
+      navigate('/');
+      window.location.reload(); // Tải lại trang
+    }
   };
 
   const [oldPassword, setOldPassword] = useState('');
