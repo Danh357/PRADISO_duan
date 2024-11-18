@@ -132,43 +132,51 @@ const ChiTiet = () => {
         }
     }
 };
- // Kiểm tra xem có dữ liệu người dùng trong localStorage hay không
- useEffect(() => {
-    // console.log(storedUser);
-    if (storedUser) {
-      // Nếu có thông tin người dùng trong localStorage, set state user
-      setUser(storedUser);
+const [user, setUser] = useState(null);
   
-      // Gửi yêu cầu tới server để lấy thêm dữ liệu người dùng nếu cần
-      const fetchUserData = async () => {
-        try {
-          const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+  // Lấy thông tin người dùng khi component tải
+  const handleSubmit = async (e) => {
+    e.preventDefault();
   
-          if (response.ok) {
-            const data = await response.json();
-            setUser(data.user); // Cập nhật thông tin người dùng từ server
-          } else {
-            console.error('Lỗi khi lấy thông tin người dùng từ server');
-          }
-        } catch (error) {
-          console.error('Có lỗi xảy ra khi kết nối tới server:', error);
-        }
-      };
-      fetchUserData(); // Gọi hàm lấy dữ liệu người dùng từ server
+    if (!user) {
+      alert('Bạn cần đăng nhập để đặt phòng!');
+      return;
     }
-  }, []);
-
+  
+    if (!checkInDate || !checkOutDate) {
+      alert('Bạn cần chọn ngày nhận và ngày trả phòng.');
+      return;
+    }
+  
+    const bookingData = {
+      id_user: user.id_user, // ID người dùng để gửi lên server
+      checkInDate: checkInDate.toLocaleDateString("en-GB"),
+      checkOutDate: checkOutDate.toLocaleDateString("en-GB"),
+      gia_homestay: homestayCT.gia_homestay, // Giá tiền homestay
+    };
+  
+    try {
+      const response = await fetch('http://localhost:3000/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        alert('Đặt phòng thành công!');
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Có lỗi xảy ra khi đặt phòng.');
+      }
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi gửi yêu cầu:', error);
+      alert('Có lỗi xảy ra, vui lòng thử lại.');
+    }
+  };
 //dat homestay
-const [user, setUser] = useState({
-    ten_user: '',
-    sdt_user: '',
-    email_user: ''
-  });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser((prevUser) => ({
@@ -177,59 +185,6 @@ const [user, setUser] = useState({
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const bookingData = {
-      ten_user: user.ten_user,
-      sdt_user: user.sdt_user,
-      email_user: user.email_user,
-      checkInDate: checkInDate.toLocaleDateString("en-GB"),
-      checkOutDate: checkOutDate.toLocaleDateString("en-GB"),
-      gia_homestay: homestayCT.gia_homestay
-    };
-         // Kiểm tra các trường hợp hợp lệ trước khi gửi yêu cầu
-        if (bookingData.ten_user.length > 20) {
-            alert('Tên không được quá 20 ký tự.');
-            return;
-        }
-    // Kiểm tra số điện thoại
-    const phoneRegex = /^0\d{9}$/; // Chỉ cho phép 10 chữ số cho số điện thoại
-    if (!phoneRegex.test(bookingData.sdt_user)) {
-    alert('Số điện thoại không hợp lệ. Vui lòng nhập lại.');
-    return;
-    }
-
-    // Kiểm tra email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.com$/;
-    if (!emailRegex.test(bookingData.email_user)) {
-    alert('Email không hợp lệ. Vui lòng nhập lại.');
-    return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:3000/booking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookingData)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        alert('Đặt phòng thành công');
-        // Làm gì đó sau khi đặt phòng thành công
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Có lỗi xảy ra khi đặt phòng');
-      }
-    } catch (error) {
-      console.error('Có lỗi xảy ra khi gửi yêu cầu:', error);
-      alert('Có lỗi xảy ra, vui lòng thử lại.');
-    }
-  };
-    
     if (error) return <p>{error}</p>;
     if (!homestayCT) return <p>Loading...</p>;
     return (
@@ -326,7 +281,14 @@ const [user, setUser] = useState({
                                                 </form>
                                             </div> */}
                                             <div className="form-booking_chitiet">
-                                                <form id="formbooking" onSubmit={handleSubmit}>
+                                            <form id="formbooking" onSubmit={handleSubmit}>
+                                                {!user ? (
+                                                        <div>
+                                                       <p style={{ fontSize: '16px', textAlign: 'center' }}>
+                                                            Bạn cần <Link to="/dk_dn" style={{ textDecoration: 'underline', color: 'blue' }}>Đăng nhập</Link> để đặt Homestay.
+                                                        </p>
+                                                        </div>
+                                                    ) : (
                                                     <div className="contact-form">
                                                         <div className="row_bth">
                                                             <div className="col-sm-12 col-xs-12">
@@ -334,13 +296,14 @@ const [user, setUser] = useState({
                                                                     <input
                                                                         required
                                                                         type="text"
-                                                                        name="ten_user" // Đảm bảo tên này khớp với đối tượng `user`
+                                                                        name="ten_user" // Đảm bảo tên này khớp với đối tượng user
                                                                         id="full_name"
                                                                         data-valid="full_name"
                                                                         className="form-control"
                                                                         placeholder="Tên của bạn"
                                                                         value={user.ten_user || ''}
                                                                         onChange={handleInputChange}
+                                                                        readOnly
                                                                         />
                                                                 </div>
                                                                 <p className="full_name-validation field-error"></p>
@@ -351,13 +314,14 @@ const [user, setUser] = useState({
                                                                     pattern="[0-9]{10,12}"
                                                                     required
                                                                     type="text"
-                                                                    name="sdt_user" // Tên này cũng khớp với đối tượng `user`
+                                                                    name="sdt_user" // Tên này cũng khớp với đối tượng user
                                                                     id="your_phone"
                                                                     data-valid="your_phone"
                                                                     className="form-control"
                                                                     placeholder="Số điện thoại"
                                                                     value={user.sdt_user || ''}
                                                                     onChange={handleInputChange}
+                                                                    readOnly
                                                                     />
                                                                 </div>
                                                                 <p className="your_phone-validation field-error"></p>
@@ -367,13 +331,14 @@ const [user, setUser] = useState({
                                                                 <input
                                                                     required
                                                                     type="text"
-                                                                    name="email_user" // Tên này cũng khớp với đối tượng `user`
+                                                                    name="email_user" // Tên này cũng khớp với đối tượng user
                                                                     id="your_email"
                                                                     data-valid="your_email"
                                                                     className="form-control"
                                                                     placeholder="Email"
                                                                     value={user.email_user || ''}
                                                                     onChange={handleInputChange}
+                                                                    readOnly
                                                                     />
                                                                 </div>
                                                                 <p className="your_email-validation field-error"></p>
@@ -445,7 +410,8 @@ const [user, setUser] = useState({
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </form>
+                                                      )}
+                                                </form> 
                                             </div>
                                         </div>
                                     </div>

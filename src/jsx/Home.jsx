@@ -153,12 +153,12 @@ function Home() {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }, []);
-  
     // Fetch homestays khi component được render
+    // sự kiện click cho show sản phẩm
+        const swiperRef = useRef(null); // Ref để truy cập Swiper instance
   
     if (error) return <p>{error}</p>;
     if (!showhomestay) return <p>Loading...</p>;
-
 return(
     <div className="section_menu">
         <div className="banner index">
@@ -395,77 +395,131 @@ return(
                         <p className="des_pro show_room">Trốn đến những ngọn núi và thung lũng xinh đẹp nơi giấc mơ thành hiện thực. Văn hóa, thiên nhiên, suối và ẩm thực. Đắm mình trong những phẩm chất phục hồi của thiên nhiên, tránh xa những xáo trộn của cuộc sống thường ngày.</p> 
                     </div>
                     <div className="btn_slide">
-                        {/* <div className="owl-nav">
-                            <button type="button" role="presentation" className="owl-prev" aria-label="prev slide">
-                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" className=""><g transform="matrix(-1,-1.2246467991473532e-16,1.2246467991473532e-16,-1,511.9994964599609,511.99959468841564)"><g><g><path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path></g></g></g></svg>
+                        <div className="owl-nav">
+                            <button type="button" role="presentation" className="owl-prev" aria-label="prev slide"   onClick={() => swiperRef.current?.slideNext()}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="512"
+                                    height="512"
+                                    viewBox="0 0 512 512"
+                                    className=""
+                                    style={{ enableBackground: "new 0 0 512 512" }}
+                                >
+                                    <g transform="matrix(-1, 0, 0, -1, 512, 512)">
+                                    <path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z" />
+                                    </g>
+                                </svg>
                             </button>
-                            <button type="button" role="presentation" className="owl-next" aria-label="next slide">
-                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" className=""><g><g><g><path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z"></path></g></g></g></svg>
+                            <button type="button" role="presentation" className="owl-next" aria-label="next slide"  onClick={() => swiperRef.current?.slidePrev()}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="512"
+                                height="512"
+                                viewBox="0 0 512 512"
+                                className=""
+                                style={{ enableBackground: "new 0 0 512 512" }}
+                            >
+                                <path d="M367.954,213.588L160.67,5.872c-7.804-7.819-20.467-7.831-28.284-0.029c-7.819,7.802-7.832,20.465-0.03,28.284l207.299,207.731c7.798,7.798,7.798,20.486-0.015,28.299L132.356,477.873c-7.802,7.819-7.789,20.482,0.03,28.284c3.903,3.896,9.016,5.843,14.127,5.843c5.125,0,10.25-1.958,14.157-5.873l207.269-207.701C391.333,275.032,391.333,236.967,367.954,213.588z" />
+                            </svg>
                             </button>
-                        </div> */}
+                        </div>
                     </div>
-                    <ul className="homestay_list" data-aos="fade-up" data-aos-duration="2000" >
-                    {Array.isArray(showhomestay) && showhomestay.slice(0,4).map((homestay) =>  (
-                        <li key={homestay.id_homestay}>
-                            <Link to={"/homestay/" + homestay.id_homestay}>
-                                <div className="img_homstay">
-                                    <div className="pro-price">
-                                        <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                                        <span>/ Đêm</span>
-                                    </div>
-                                    {images.length > 0 ? (
-                                        images.map((image, index) => {
-                                        if (homestay.id_homestay === image.id_hinh) {
-                                            return (
-                                                <div key={image.id_homestay || index} className="add_img"> {/* Sử dụng image.id hoặc index */}
-                                                    <img
-                                                    src={image.url_hinh}
-                                                    alt={homestay.ten_homestay || 'Hình ảnh homestay'}
-                                                    />
+                        <ul className="homestay_list" data-aos="fade-up" data-aos-duration="2000" ></ul>
+                          <>
+                            <Swiper
+                                slidesPerView={4} // Hiển thị tối đa 3 slides
+                                spaceBetween={30} // Khoảng cách giữa các slides
+                                pagination={{
+                                clickable: true,
+                                }}
+                                autoplay={{
+                                  delay: 3000,
+                                  disableOnInteraction: false,
+                                }}
+                                breakpoints={{
+                                    768: { // Trên 768px
+                                    slidesPerView: 4, // Hiển thị 4 slides
+                                    spaceBetween: 30,
+                                    },
+                                    480: { // Từ 480px đến 767px
+                                    slidesPerView: 2, // Hiển thị 2 slides
+                                    spaceBetween: 20,
+                                    },
+                                    0: { // Dưới 480px
+                                    slidesPerView: 1, // Hiển thị 1 slide
+                                    spaceBetween: 10,
+                                    },
+                                }}
+                                onSwiper={(swiper) => {
+                                    swiperRef.current = swiper; // Lưu instance của Swiper
+                                  }}
+                                modules={[Pagination, Autoplay]}
+                                className="mySwiper"
+                                >
+                                {Array.isArray(showhomestay) && showhomestay.slice(0,10).map((homestay) =>  (
+                                <SwiperSlide>
+                                    <li key={homestay.id_homestay}>
+                                        <Link to={"/homestay/" + homestay.id_homestay}>
+                                            <div className="img_homstay">
+                                                <div className="pro-price">
+                                                    <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                    <span>/ Đêm</span>
                                                 </div>
-                                                );
-                                            }
-                                            return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
-                                            })
-                                        ) : (
-                                            <p>Không có hình để hiển thị</p>
-                                        )}
-                                    {/* <img src="/image/HST2.png" alt=""/> */}
-                                </div>
-                                <div className="des_hst">
-                                    <div className="proloop-detail">
-                                        <h3><Link to={"/homestay/" + homestay.id_homestay}>{homestay.ten_homestay}</Link></h3>
-                                        <div className="pro-tag">
-                                            <div className="tag-item tag-area">
-                                                <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
-                                            </div>                                     
-                                            <div className="tag-item tag-guests">
-                                                <span>10</span> <span className="tag-unit">Guests</span>
+                                                {images.length > 0 ? (
+                                                    images.map((image, index) => {
+                                                    if (homestay.id_homestay === image.id_hinh) {
+                                                        return (
+                                                            <div key={image.id_homestay || index} className="add_img"> {/* Sử dụng image.id hoặc index */}
+                                                                <img
+                                                                src={image.url_hinh}
+                                                                alt={homestay.ten_homestay || 'Hình ảnh homestay'}
+                                                                />
+                                                            </div>
+                                                            );
+                                                        }
+                                                        return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
+                                                        })
+                                                    ) : (
+                                                        <p>Không có hình để hiển thị</p>
+                                                    )}
+                                                {/* <img src="/image/HST2.png" alt=""/> */}
                                             </div>
-                                            <div className="tag-item tag-bed">
-                                                <span>5</span> <span className="tag-unit">Beds</span>
+                                            <div className="des_hst">
+                                                <div className="proloop-detail">
+                                                    <h3><Link to={"/homestay/" + homestay.id_homestay}>{homestay.ten_homestay}</Link></h3>
+                                                    <div className="pro-tag">
+                                                        <div className="tag-item tag-area">
+                                                            <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
+                                                        </div>                                     
+                                                        <div className="tag-item tag-guests">
+                                                            <span>10</span> <span className="tag-unit">Guests</span>
+                                                        </div>
+                                                        <div className="tag-item tag-bed">
+                                                            <span>5</span> <span className="tag-unit">Beds</span>
+                                                        </div>
+                                                        <div className="tag-item tag-bathroom">
+                                                            <span>4</span> <span className="tag-unit">Bathroom</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="pro-desc">
+                                                        Double Suite rộng 150m² với thiết kế trong suốt, nằm ở tầng cao nhất của khách sạn, mang đến tầm nhìn toàn cảnh tuyệt đẹp...
+                                                    </div>
+                                                    <div className="btn_ev">
+                                                        <Link to={"/homestay/" + homestay.id_homestay}>
+                                                            <span>Xem chi tiết
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
+                                                            </span>
+                                                        </Link>
+                                                    </div>   
+                                                    
+                                                </div>
                                             </div>
-                                            <div className="tag-item tag-bathroom">
-                                                <span>4</span> <span className="tag-unit">Bathroom</span>
-                                            </div>
-                                        </div>
-                                        <div className="pro-desc">
-                                            Double Suite rộng 150m² với thiết kế trong suốt, nằm ở tầng cao nhất của khách sạn, mang đến tầm nhìn toàn cảnh tuyệt đẹp...
-                                        </div>
-                                        <div className="btn_ev">
-                                            <Link to={"/homestay/" + homestay.id_homestay}>
-                                                <span>Xem chi tiết
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
-                                                </span>
-                                            </Link>
-                                        </div>   
-                                        
-                                    </div>
-                                </div>
-                            </Link>
-                        </li>
-                    ))}
-                    </ul>
+                                        </Link>
+                                    </li>
+                                </SwiperSlide>
+                                ))}
+                            </Swiper>
+                         </>
                 </div>
             </div>
 {/* <!-- show homstay  --> */}
@@ -714,58 +768,70 @@ return(
 {/* <!-- footer-intagram --> */}
                 <div className="footer-instagram" data-aos="fade-zoom-in" data-aos-easing="ease-in-out"data-aos-delay="400" data-aos-offset="0">
                     <div className="min_warp2">
-                        <>
-                            <Swiper
-                             slidesPerView={4}
-                            spaceBetween={30}
-                            centeredSlides={true}
-                            autoplay={{
-                            delay: 2500,
-                            disableOnInteraction: false,
-                            }}
-                            pagination={{
-                            clickable: true,
-                            }}
-                            navigation={true}
-                            modules={[Autoplay, Pagination, Navigation]}
-                            className="mySwiper"
-                            >
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                            <SwiperSlide>
-                                <div className="box_intagram">
-                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                                </div>   
-                            </SwiperSlide>
-                           
-                            </Swiper>
-                        </>
+                        <div className="row_col">
+                            <>
+                                <Swiper
+                                    slidesPerView={4}
+                                    spaceBetween={30}
+                                    pagination={{
+                                      clickable: true,
+                                    }}
+                                    autoplay={{
+                                      delay: 3000, // Delay between slides in milliseconds
+                                      disableOnInteraction: false, // Continue autoplay after user interaction
+                                    }}
+                                    breakpoints={{
+                                        768: { // Trên 768px
+                                          slidesPerView: 4, // Hiển thị 4 slides
+                                          spaceBetween: 30,
+                                        },
+                                        480: { // Từ 480px đến 767px
+                                          slidesPerView: 2, // Hiển thị 2 slides
+                                          spaceBetween: 20,
+                                        },
+                                        0: { // Dưới 480px
+                                          slidesPerView: 1, // Hiển thị 1 slide
+                                          spaceBetween: 10,
+                                        },
+                                    }}
+                                    modules={[Pagination, Autoplay]}
+                                    className="mySwiper"
+                                >
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                        <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
+                                    </div>   
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_2.jpg?v=2537" alt="Instgram 2"/>
+                                    </div>   
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_3.jpg?v=2537" alt="Instgram 3"/>
+                                    </div>   
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                    <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_4.jpg?v=2537" alt="Instgram 4"/>
+                                    </div>   
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                        <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
+                                    </div>   
+                                </SwiperSlide>
+                                <SwiperSlide>
+                                    <div className="box_intagram">
+                                        <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
+                                    </div>   
+                                </SwiperSlide>
+                              
 
-                        {/* <div className="row_col">
-                            <div className="box_intagram">
+                                </Swiper>
+                            </>
+                            {/* <div className="box_intagram">
                                 <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
                             </div>   
                             <div className="box_intagram">
@@ -776,8 +842,8 @@ return(
                             </div>           
                             <div className="box_intagram">
                                 <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_4.jpg?v=2537" alt="Instgram 4"/>
-                            </div>           
-                        </div> */}
+                            </div>            */}
+                        </div>
                         <div className="btn-more text-center">
                             <a href="#"><button className="ocean-button" id="oceanButton"><i className="fa-brands fa-instagram"></i> Theo dõi trên Instagram</button></a>
                         </div>
