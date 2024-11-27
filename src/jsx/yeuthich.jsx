@@ -1,8 +1,10 @@
 
 import React, { useState,useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
 function Thich() {
+    const navigate = useNavigate();
     // const { id } = useParams();
     // const [showyeuthich, setHomestay] = useState(null);
     // const [error, setError] = useState(null);
@@ -38,7 +40,10 @@ function Thich() {
     // };
 
     // console.log('storedFavorites')
-    
+    // Hàm quay lại trang trước đó
+  const handleGoBack = () => {
+    navigate(-1); // Giá trị -1 nghĩa là quay lại trang trước
+  };
 
     return (
 <div className="danhs1">
@@ -129,19 +134,19 @@ function Thich() {
                             ))}
                     </ul>
                        ) : (
-                        <h4 className='no_product'>Chưa có Homstay yêu thích nào</h4>
+                        <div className="no_product">
+                        <h4>Chưa có Homestay yêu thích nào...</h4>
+                        <Link to="/phong" className="link-to-room">
+                        <span>  Xem phòng ngay</span>
+                        </Link>
+                      </div>
+                    
                     )}
                 </div>
                 <div className="paginate">
-                    <div className="PageNum">
-                        <a className="nofollow active-3" href="#">1</a>
-                        <a className="nofollow" href="#">2</a>
-                        <a className="nofollow" href="#">3</a>
-                        <a className="nofollow" href="#">4</a>
-                        <a className="nofollow" href="#"> » </a>
-                        <a className="nofollow" href="#"> › </a>                
-                    </div>
-                    <div className="clear"></div>
+                    <div class="btn_ev page_yeuthich" data-aos="fade-up" data-aos-duration="1000" onClick={handleGoBack} >
+                        <a href="#"><span>Trở về</span></a>
+                    </div>       
                 </div>
             </div>
         </div>

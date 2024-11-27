@@ -5,9 +5,7 @@ import DatePicker from 'react-datepicker';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+
 function Home() {
     const { id } = useParams();
     const [showhomestay, setHomestay] = useState(null); // Lưu thông tin homestay
@@ -28,6 +26,7 @@ function Home() {
     const [selectedLoaiId, setSelectedLoaiId] = useState(null); // ID loại phòng đã chọn
     const [images, setImages] = useState([]); // Hình ảnh homestay
   
+
     // Hàm fetch hình ảnh homestay
     const fetchHomestayImages = async () => {
       try {
@@ -39,7 +38,7 @@ function Home() {
         console.error('Failed to fetch images:', error);
       }
     };
-  
+    
     // Fetch hình ảnh khi component mount
     useEffect(() => {
       fetchHomestayImages();
@@ -82,24 +81,12 @@ function Home() {
     }, []);
   
     // Hàm thay đổi loại phòng khi người dùng chọn từ dropdown
-    const handleChangeLoaiPhong = (event) => {
+     const handleChangeLoaiPhong = (event) => {
       const value = event.target.value;
       setSelectedLoaiId(value === 'all' ? null : value); // Nếu chọn 'all', gán selectedLoaiId là null
       setLoaiPhongHienThi(value); // Cập nhật loại phòng hiện thi
     };
   
-    // // Fetch dữ liệu homestays
-    // useEffect(() => {
-    //   const fetchProducts = async () => {
-    //     try {
-    //       const response = await axios.get('http://localhost:3000/homestay'); // API lấy homestay
-    //       setHomestays(response.data); // Lưu sản phẩm vào state
-    //     } catch (error) {
-    //       console.error('Lỗi khi fetch sản phẩm:', error);
-    //     }
-    //   };
-    //   fetchProducts();
-    // }, []);
   
     // Tính toán chỉ số của homestay bắt đầu và kết thúc trên trang hiện tại
     const indexOfLastHomestay = currentPage * homestaysPerPage;
@@ -156,7 +143,26 @@ function Home() {
     // Fetch homestays khi component được render
     // sự kiện click cho show sản phẩm
         const swiperRef = useRef(null); // Ref để truy cập Swiper instance
-  
+        
+        const datePickerRef = useRef(null);
+
+useEffect(() => {
+  // Hàm đóng DatePicker khi click ngoài
+  const handleClickOutside = (event) => {
+    if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+      setIsCheckInOpen(false); // Đóng DatePicker khi click ngoài
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+const handleDatePickerClick = (e) => {
+  e.stopPropagation(); // Ngừng sự kiện lan truyền ra ngoài
+};
     if (error) return <p>{error}</p>;
     if (!showhomestay) return <p>Loading...</p>;
 return(
@@ -179,7 +185,7 @@ return(
                     <div className="checkin_homstay t-datepicker" >
                         <div className="date_check_in search_item"  onClick={() => setIsCheckInOpen(!isCheckInOpen)}>
                             <div className="seach_icons">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
                                     <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
                                     <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
                                     <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
@@ -196,7 +202,7 @@ return(
                                         <span className="t-year-check-in">{checkInDate.getFullYear()}</span>
                                     </div>
                                     {isCheckInOpen && (
-                                    <div className="date-picker-container1">
+                                    <div className="date-picker-container1"  ref={datePickerRef}  onClick={handleDatePickerClick}>
                                     <DatePicker
                                     selected={checkInDate} // Ngày hiện tại
                                     onChange={(date) => {
@@ -210,6 +216,9 @@ return(
                                     onClickOutside={() => setIsCheckInOpen(false)} // Đóng khi click ra ngoài
                                     inline // Hiển thị lịch luôn
                                     minDate={new Date()} // Vô hiệu hóa các ngày đã qua
+                                    showMonthDropdown // Hiển thị dropdown tháng
+                                    showYearDropdown // Hiển thị dropdown năm
+                                    dropdownMode="select" // Dropdown dạng select
                                     />
                                     </div>
                                     )}
@@ -218,7 +227,7 @@ return(
                         </div>
                         <div className="date_check_out search_item"  onClick={() => setIsCheckOutOpen(!isCheckOutOpen)}>
                             <div className="seach_icons">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
                                     <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
                                     <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
                                     <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
@@ -238,7 +247,7 @@ return(
                                         <span className="t-year-check-out">{checkOutDate.getFullYear()}</span>
                                     </div>
                                     {isCheckOutOpen && (
-                                    <div className="date-picker-container2">
+                                    <div className="date-picker-container2"  ref={datePickerRef}  onClick={handleDatePickerClick}>
                                         <DatePicker
                                     selected={checkOutDate}
                                     onChange={(date) => {
@@ -251,6 +260,9 @@ return(
                                     todayButton="Hôm nay"
                                     onClickOutside={() => setIsCheckOutOpen(false)}
                                     inline
+                                    showMonthDropdown // Hiển thị dropdown tháng
+                                    showYearDropdown // Hiển thị dropdown năm
+                                    dropdownMode="select" // Dropdown dạng select
                                     minDate={checkInDate} // Vô hiệu hóa các ngày trước ngày nhận phòng
                                 />
                                 </div>
@@ -396,11 +408,11 @@ return(
                     </div>
                     <div className="btn_slide">
                         <div className="owl-nav">
-                            <button type="button" role="presentation" className="owl-prev" aria-label="prev slide"   onClick={() => swiperRef.current?.slideNext()}>
+                            <button type="button" role="presentation" className="owl-prev" aria-label="prev slide"    onClick={() => swiperRef.current?.slidePrev()}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="512"
-                                    height="512"
+                                    height="512px"
                                     viewBox="0 0 512 512"
                                     className=""
                                     style={{ enableBackground: "new 0 0 512 512" }}
@@ -410,11 +422,11 @@ return(
                                     </g>
                                 </svg>
                             </button>
-                            <button type="button" role="presentation" className="owl-next" aria-label="next slide"  onClick={() => swiperRef.current?.slidePrev()}>
+                            <button type="button" role="presentation" className="owl-next" aria-label="next slide" onClick={() => swiperRef.current?.slideNext()} >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="512"
-                                height="512"
+                                height="512px"
                                 viewBox="0 0 512 512"
                                 className=""
                                 style={{ enableBackground: "new 0 0 512 512" }}
@@ -437,8 +449,16 @@ return(
                                   disableOnInteraction: false,
                                 }}
                                 breakpoints={{
-                                    768: { // Trên 768px
+                                    900: { // Trên 768px
                                     slidesPerView: 4, // Hiển thị 4 slides
+                                    spaceBetween: 30,
+                                    },
+                                    800: { // Trên 768px
+                                    slidesPerView: 3, // Hiển thị 4 slides
+                                    spaceBetween: 30,
+                                    },
+                                    767: { // Trên 768px
+                                    slidesPerView: 3, // Hiển thị 4 slides
                                     spaceBetween: 30,
                                     },
                                     480: { // Từ 480px đến 767px
@@ -456,7 +476,7 @@ return(
                                 modules={[Pagination, Autoplay]}
                                 className="mySwiper"
                                 >
-                                {Array.isArray(showhomestay) && showhomestay.slice(0,10).map((homestay) =>  (
+                                {Array.isArray(showhomestay) && showhomestay.slice(0,20).map((homestay) =>  (
                                 <SwiperSlide>
                                     <li key={homestay.id_homestay}>
                                         <Link to={"/homestay/" + homestay.id_homestay}>

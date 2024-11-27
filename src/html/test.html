@@ -1,118 +1,38 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-
-        .profile-container_infor_nguoidung {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-card_infor_nguoidung {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-
-        .profile-avatar_infor_nguoidung img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            background-color: red;
-        }
-
-        .profile-info_infor_nguoidung {
-            margin-left: 20px;
-        }
-
-        .profile-info_infor_nguoidung h2 {
-            margin: 0;
-            font-size: 20px;
-            color: #333;
-        }
-
-        .profile-info_infor_nguoidung .badge_infor_nguoidung {
-            background-color: #d4edda;
-            color: #155724;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 10px;
-        }
-
-        .profile-info_infor_nguoidung p {
-            margin: 5px 0;
-            color: #555;
-            font-size: 14px;
-        }
-
-        .profile-actions_infor_nguoidung {
-            display: flex;
-            justify-content: space-around;
-        }
-
-        .action_infor_nguoidung {
-            text-align: center;
-            flex: 1;
-            border: 1px dashed #ccc;
-            margin: 0 10px;
-            padding: 10px;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .action_infor_nguoidung:hover {
-            border-color: #007bff;
-            background-color: #f1f9ff;
-        }
-
-        .action_infor_nguoidung .icon_infor_nguoidung {
-            font-size: 24px;
-            color: #555;
-        }
-
-        .action_infor_nguoidung p {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .action_infor_nguoidung .count_infor_nguoidung {
-            font-weight: bold;
-            font-size: 16px;
-            color: #007bff;
-        }
-    </style>
-</head>
-<body>
-    <div className="profile-container_infor_nguoidung">
-        <div className="profile-card_infor_nguoidung">
-            <div className="profile-avatar_infor_nguoidung">
-                <img src="https://via.placeholder.com/100/FF0000/FFFFFF?text=Avatar" alt="Avatar">
-            </div>
-            <div className="profile-info_infor_nguoidung">
-                <h2>589. Đỗ Công Danh <span className="badge_infor_nguoidung">Chưa xác thực EKYC</span></h2>
-                <p><span className="icon_infor_nguoidung">📞</span> 0777092128</p>
-                <p><span className="icon_infor_nguoidung">✉️</span> docongdanh357@gmail.com</p>
-            </div>
+<div className="profile-container_infor_nguoidung">
+    <div className="profile-card_infor_nguoidung">
+      <div className="profile-avatar_infor_nguoidung">
+        <img src="../../image/user2.png" alt="Avatar" />
+        {/* Icon đổi avatar với input file */}
+        <div className="change-avatar-icon">
+          <label htmlFor="avatar-upload">
+            <i className="fa-regular fa-image"></i>
+          </label>
+          <input
+            type="file"
+            id="avatar-upload"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleAvatarChange}
+          />
         </div>
+      </div>
+      <div className="profile-info_infor_nguoidung">
+        <h2>
+          {user.id_user}. {user.ten_user}
+        </h2>
+        <p>
+          <span className="icon_infor_nguoidung">
+            <i className="fa-solid fa-phone"></i>
+          </span>{" "}
+          {user.sdt_user}
+        </p>
+        <p>
+          <span className="icon_infor_nguoidung">
+            <i className="fa-solid fa-envelope"></i>
+          </span>{" "}
+          {user.email_user}
+        </p>
+      </div>
     </div>
-</body>
-</html>
+  </div>
+  

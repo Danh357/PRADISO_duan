@@ -11,8 +11,15 @@ function Header() {
     const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
     const dropdownRef = useRef(null); // Tham chiếu đến dropdown
-    const [favoriteCount, setFavoriteCount] = useState(0);//yeu thich
     const [user, setUser] = useState(null); // Thông tin người dùng
+    const [favorites, setFavorites] = useState([]);
+    const [favoriteCount, setFavoriteCount] = useState(0);
+    const storedUser = JSON.parse(localStorage.getItem('auth'));
+    const [imageUrl, setImageUrl] = useState(null); // Thêm state này ở đầu file component
+    const defaultAvatar = '../../image/user2.png';
+
+    
+    //kiem tra nguoi dung dang nhap
     useEffect(() => {
         // Kiểm tra trạng thái đăng nhập khi component mount
         const storedUser = JSON.parse(localStorage.getItem('auth'));
@@ -22,10 +29,39 @@ function Header() {
         }
     }, []);
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`);
+            if (response.ok) {
+              const data = await response.json();
+              setUser(data.user);
+              
+              // Kiểm tra nếu người dùng có ảnh, nếu không thì sẽ dùng ảnh mặc định
+              if (data.user.avatar && data.user.avatar !== "../../image/user2.png") {
+                setImageUrl(`http://localhost:3000${data.user.avatar}`);  // Hiển thị ảnh từ server
+              } else {
+                setImageUrl("../../image/user2.png");  // Hiển thị ảnh mặc định
+              }
+            } else {
+              console.error('Lỗi khi lấy dữ liệu người dùng');
+            }
+          } catch (error) {
+            console.error('Lỗi kết nối với server:', error);
+          }
+        };
+      
+        if (storedUser) {
+          fetchUserData();
+        }
+      }, []);
+
+    //togdhown xuong
     const toggleDropdown = () => {
         setShowDropdown(!showDropdown);
     };
-      
+    //dang xuat
+
     const handleLogout = () => {
         // Xóa thông tin người dùng khi đăng xuất
         localStorage.removeItem('auth');
@@ -33,6 +69,7 @@ function Header() {
         setUser(null);
         navigate('/');
     };
+
     // Đóng dropdown nếu người dùng nhấp bên ngoài
     const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -60,11 +97,15 @@ function Header() {
   
       // Xóa lắng nghe sự kiện khi component bị unmount
       return () => window.removeEventListener('storage', updateFavoriteCount);
-    }, [JSON.parse(localStorage.getItem('favorites')).length]);
-
+    }, []);
+    // JSON.parse(localStorage.getItem('favorites')).length
+    
+    const handleGoToProfile = () => {
+        window.location.href = "/infor_user";
+      };
      // reload trang
      const handleLogoClick = () => {
-        window.location.reload();
+        window.location.href = "/";
     };
 
     return(
@@ -83,52 +124,52 @@ function Header() {
                     <nav className="navbar">
                         <ul className="list_menu">
                             <li>
-                            <NavLink exact to="/" activeClassName="active">
+                            <NavLink  to="/" activeClassName="active">
                                 Trang chủ
                             </NavLink>
                             </li>
                             <li>
-                            <NavLink to="/phong" activeClassName="active">
+                            <NavLink   to="/phong" activeClassName="active">
                                 Phòng
                             </NavLink>
                             </li>
                             <li className="has-submenu">
-                            <NavLink to="/dichvu" activeClassName="active">
+                            <NavLink   to="/dichvu" activeClassName="active">
                                 Dịch vụ tại Paradiso
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 128 128">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12px" viewBox="0 0 128 128">
                                 <g><path d="m64 88c-1.023 0-2.047-.391-2.828-1.172l-40-40c-1.563-1.563-1.563-4.094 0-5.656s4.094-1.563 5.656 0l37.172 37.172 37.172-37.172c1.563-1.563 4.094-1.563 5.656 0s1.563 4.094 0 5.656l-40 40c-.781.781-1.805 1.172-2.828 1.172z"></path></g>
                                 </svg>
                             </NavLink>
                             <ul className="menuList-submain">
                                 <li>
-                                <NavLink to="/dichvu/nhahang" activeClassName="active">
+                                <NavLink   to="/dichvu/nhahang" activeClassName="active">
                                     Nhà hàng
                                 </NavLink>
                                 </li>
                                 <li>
-                                <NavLink to="/dichvu/tiecsukien" activeClassName="active">
+                                <NavLink   to="/dichvu/tiecsukien" activeClassName="active">
                                     Tiệc &amp; Sự kiện
                                 </NavLink>
                                 </li>
                                 <li>
-                                <NavLink to="/dichvu/spa" activeClassName="active">
+                                <NavLink   to="/dichvu/spa" activeClassName="active">
                                     Spa &amp; Massage
                                 </NavLink>
                                 </li>
                             </ul>
                             </li>
                             <li>
-                            <NavLink to="/cndulich" activeClassName="active">
+                            <NavLink   to="/cndulich" activeClassName="active">
                                 Cẩm nang du lịch
                             </NavLink>
                             </li>
                             <li>
-                            <NavLink to="/gioithieu" activeClassName="active">
+                            <NavLink   to="/gioithieu" activeClassName="active">
                                 Giới thiệu
                             </NavLink>
                             </li>
                             <li>
-                            <NavLink to="/lienhe" activeClassName="active">
+                            <NavLink   to="/lienhe" activeClassName="active">
                                 Liên hệ
                             </NavLink>
                             </li>
@@ -137,7 +178,7 @@ function Header() {
                         <div className="wap_login_contact">
                             {isLoggedIn ? (
                                 <div className="user-display"  ref={dropdownRef}>
-                                <Link to={'/thich'}>
+                                <Link   to={'/thich'}>
                                     <span className="num_cart" ><i height class="fa-light fa-heart"></i>
                                     <p className="num_click_c" id="card_num">{favoriteCount}</p>
                                     </span>
@@ -146,15 +187,15 @@ function Header() {
                                    <img
                                         id="menuButton"
                                         onClick={toggleDropdown}
-                                        src={user.image || '../../image/user2.png'}
+                                        src={imageUrl||defaultAvatar}
                                         alt="User"
                                         className="user-image"
                                     />
                                     {showDropdown && (
                                         <div id="dropdown" className="dropdown_user_logout" >
-                                            <Link to="/infor_user">
+                                            <Link to={``} onClick={handleGoToProfile}>
                                                <div className="bg_btn_login_out">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16px" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
                                                         <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"></path>
                                                         <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"></path>
                                                     </svg>
@@ -165,7 +206,7 @@ function Header() {
                                             </Link>
                                             <Link to="/" onClick={handleLogout}>
                                             <div className="bg_btn_login_out">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16px" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
                                                     <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"></path>
                                                     <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"></path>
                                                 </svg>

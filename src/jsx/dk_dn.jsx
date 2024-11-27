@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext '; // Import useAuth hook
 
 
 const DK_DN = () => {
+  const { login } = useAuth(); // Lấy hàm login từ context
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
   const [email_user, setEmail] = useState('');
   const [pass_user, setPassword] = useState('');
@@ -95,54 +97,119 @@ const DK_DN = () => {
       }
   };
   ///dang nhap
+
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
+  
+  //   try {
+  //     // Gửi yêu cầu POST tới server để kiểm tra tài khoản
+  //     const response = await fetch('http://localhost:3000/login', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ email_user, pass_user }),
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     // Kiểm tra nếu đăng nhập thành công
+  //     if (response.ok) {
+  //       if (data.user) {
+  //         console.log('Đăng nhập thành công:', data);
+  //         login(data.user);      
+  //         localStorage.setItem('auth', JSON.stringify(data.user));
+  //         // Điều hướng dựa trên vai trò của người dùng
+  //         switch (data.user.role) {
+  //           case 0: // ADMIN
+  //             alert('Đăng nhập thành công với quyền ADMIN.');
+  //             navigate('/admin');
+  //             break;
+  //           case 1: // NHÂN VIÊN
+  //             alert('Đăng nhập thành công với quyền NHÂN VIÊN.');
+  //             navigate('/admin');
+  //             break;
+  //           case 2: // USER
+  //             alert('Đăng nhập thành công! Chào mừng ' + data.user.ten_user);
+  //             navigate('/');
+  //             break;
+  //           default:
+  //             alert('Vai trò không hợp lệ.');
+  //         }
+  
+  //         // Reload trang sau khi điều hướng
+  //         window.location.reload();
+  //       } else {
+  //         // Nếu tài khoản không tồn tại
+  //         setError('Tài khoản không tồn tại.');
+  //         setShowRegisterLink('false');
+  //       }
+  //     } else {
+  //       // Nếu có lỗi từ phía server
+  //       setError(data.message || 'Có lỗi không xác định từ server');
+  //       setShowRegisterLink('false');
+  //     }
+  //   } catch (error) {
+  //     // Nếu có lỗi xảy ra khi kết nối tới API
+  //     setError('Có lỗi xảy ra khi đăng nhập: ' + error.message);
+  //     setShowRegisterLink('false');
+  //   }
+  // };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
-      // Gửi yêu cầu POST tới server để kiểm tra tài khoản
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email_user, pass_user }),
-      });
-  
-      const data = await response.json();
-  
-      // Kiểm tra nếu đăng nhập thành công
-      if (response.ok) {
-        if (data.user) {
-          console.log('Đăng nhập thành công:', data);
-  
-          // Lưu thông tin người dùng vào localStorage
-          localStorage.setItem('auth', JSON.stringify(data.user));
-  
-          // Tiến hành điều hướng tới trang chủ hoặc trang quản trị tùy thuộc vào vai trò
-          if (data.user.role === 2) {
-            alert('Đăng nhập thành công với quyền ADMIN.');
-            navigate('/admin');
-          } else {
-            alert('Đăng nhập thành công! Chào mừng ' + data.user.ten_user);
-            navigate('/');
-            window.location.reload();
-          }
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email_user, pass_user }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (data.user) {
+                console.log('Đăng nhập thành công:', data);
+                login(data.user);  // Gọi login từ context để cập nhật trạng thái người dùng
+                localStorage.setItem('auth', JSON.stringify(data.user));
+
+                // Điều hướng dựa trên vai trò
+                switch (data.user.role) {
+                    case 0: // ADMIN
+                        alert('Đăng nhập thành công với quyền ADMIN.');
+                        navigate('/admin');
+                        break;
+                    case 1: // NHÂN VIÊN
+                        alert('Đăng nhập thành công với quyền NHÂN VIÊN.');
+                        navigate('/admin');
+                        break;
+                    case 2: // USER
+                        alert('Đăng nhập thành công! Chào mừng ' + data.user.ten_user);
+                        navigate('/');
+                        break;
+                    default:
+                        alert('Vai trò không hợp lệ.');
+                }
+
+                // Reload trang sau khi điều hướng
+                window.location.reload();
+            } else {
+                setError('Tài khoản không tồn tại.');
+                setShowRegisterLink('false');
+            }
         } else {
-          // Nếu tài khoản không tồn tại
-          setError('Tài khoản không tồn tại.');
-          setShowRegisterLink('false');
+            setError(data.message || 'Có lỗi không xác định từ server');
+            setShowRegisterLink('false');
         }
-      } else {
-        // Nếu có lỗi từ phía server
-        setError(data.message || 'Có lỗi không xác định từ server');
-        setShowRegisterLink('false');
-      }
     } catch (error) {
-      // Nếu có lỗi xảy ra khi kết nối tới API
-      setError('Có lỗi xảy ra khi đăng nhập: ' + error.message);
-      setShowRegisterLink('false');
+        setError('Có lỗi xảy ra khi đăng nhập: ' + error.message);
+        setShowRegisterLink('false');
     }
-  };
+};
+  
   return (
     <div className="main">
     <div className="danh">121</div>

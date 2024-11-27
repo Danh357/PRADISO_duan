@@ -5,6 +5,66 @@ function Infor_User_Qldh() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem('auth'));
+  const defaultAvatar = '../../image/user2.png';
+  const [imageUrl, setImageUrl] = useState(null); // Thêm state này ở đầu file component
+
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}`);
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+          
+          // Kiểm tra nếu người dùng có ảnh, nếu không thì sẽ dùng ảnh mặc định
+          if (data.user.avatar && data.user.avatar !== "../../image/user2.png") {
+            setImageUrl(`http://localhost:3000${data.user.avatar}`);  // Hiển thị ảnh từ server
+          } else {
+            setImageUrl("../../image/user2.png");  // Hiển thị ảnh mặc định
+          }
+        } else {
+          console.error('Lỗi khi lấy dữ liệu người dùng');
+        }
+      } catch (error) {
+        console.error('Lỗi kết nối với server:', error);
+      }
+    };
+  
+    if (storedUser) {
+      fetchUserData();
+    }
+  }, []);
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      formData.append('id_user', storedUser.id_user);
+
+      try {
+        const response = await fetch(`http://localhost:3000/user/${storedUser.id_user}/avatar`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert('Cập nhật ảnh đại diện thành công!');
+
+          // Cập nhật URL ảnh đại diện mới
+          setImageUrl(`http://localhost:3000${data.avatarPath}`);
+        } else {
+          alert('Cập nhật ảnh đại diện thất bại');
+        }
+      } catch (error) {
+        console.error('Lỗi khi kết nối với server:', error);
+      }
+    }
+  };
+
+
 
   // Kiểm tra xem có dữ liệu người dùng trong localStorage hay không
   useEffect(() => {
@@ -67,9 +127,22 @@ function Infor_User_Qldh() {
             <div className="box_user">
                 <div className="profile-container_infor_nguoidung">
                       <div className="profile-card_infor_nguoidung">
-                          <div className="profile-avatar_infor_nguoidung">
-                              <img src="../../image/user2.png" alt="Avatar"/>
+                        <div className="profile-avatar_infor_nguoidung">
+                        <img src={imageUrl || defaultAvatar} alt="Avatar" />
+                          <div
+                            className="change-avatar-icon"
+                            onClick={() => document.getElementById("avatarInput").click()}
+                          >
+                            <i className="fa-regular fa-image"></i>
+                            <input
+                              hidden
+                              id="avatarInput"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileChange}
+                            />
                           </div>
+                      </div>
                           <div className="profile-info_infor_nguoidung">
                               <h2>{user.id_user}. {user.ten_user}</h2>
                               <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
