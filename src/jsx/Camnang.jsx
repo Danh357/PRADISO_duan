@@ -1,7 +1,65 @@
-import React from "react";
-import { Link } from 'react-router-dom';
-// import './camnang.css';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom"
+import axios from 'axios';
 const CamNang = () => {
+  const [articles, setArticles] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [latestArticles, setLatestArticles] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [isLatestPostsOpen, setLatestPostsOpen] = useState(true);
+  const [isLatestCatasOpen, setLatestCatasOpen] = useState(false);
+  
+  
+    const toggleLatestPosts = () => {
+      setLatestPostsOpen(!isLatestPostsOpen);
+    };
+  
+    const toggcata = () => {
+      setLatestCatasOpen(!isLatestCatasOpen);
+    };
+
+  useEffect(() => {
+    fetchArticles(currentPage);
+  }, [currentPage]);
+
+  const fetchArticles = async (page) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/articles?page=${page}`);
+      const data = await response.json();
+      
+      // Sắp xếp các bài viết theo ngày giảm dần
+      const sortedArticles = data.articles.sort(
+        (a, b) => new Date(b.publish_date) - new Date(a.publish_date)
+      );
+
+      setArticles(sortedArticles);
+      setTotalPages(data.totalPages);
+
+      // Lấy 5 bài viết mới nhất
+      setLatestArticles(sortedArticles.slice(0, 5));
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+    }
+  };
+  useEffect(() => {
+    // Fetch data from API
+    axios.get("http://localhost:3000/baivietmoi")
+      .then((response) => {
+        setPosts(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching posts:", error);
+      });
+  }, []);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+
   return (
     <main className="wrapperMain_content">
       <div className="danh">12233</div>
@@ -31,12 +89,9 @@ const CamNang = () => {
                   itemscope
                   itemtype="http://schema.org/ListItem"
                 >
-                  <span
-                    itemprop="item"
-                    content="https://maple-inn.myharavan.com/blogs/news"
-                  >
-                    <strong itemprop="name">Tin tức</strong>
-                  </span>
+                  <Link to="/cndulich" target="_self" itemprop="item">
+                    <span itemprop="name">Tin tức</span>
+                  </Link>
                   <meta itemprop="position" content="2" />
                 </li>
               </ol>
@@ -49,205 +104,60 @@ const CamNang = () => {
               <div className="col-lg-9 col-md-12 col-12 boxBlog-left">
                 <div className="listBlogs-content">
                   <div className="heading-page">
-                    <h1>Tin tức</h1>
+                    <h1>Tin tức</h1>  
                   </div>
                   <div className="list-article-content blog-posts row6">
                     {/* <!-- Begin: Nội dung blog --> */}
-
-                    <article className="article-loop col-md-6 col-6 col_col ">
+                    {articles.map((article) => (
+                    <article className="article-loop col-md-6 col-6 col_col"  key={article.id}>
                       <div className="article-inner">
                         <div className="article-image">
-                          <a
-                            href="/blogs/news/paddling-tour"
-                            className="blog-post-thumbnail"
-                            title="Paddling Tour"
-                            rel="nofollow"
-                          >
-                            <img
-                              className="lazyload"
-                              src="//file.hstatic.net/200000909393/article/img-69-800x600-1_3f16d7045e9a4dd49d5acc42384a3d5f_1024x1024.jpg"
-                              alt="Paddling Tour"
-                            />
-                          </a>
+                        <Link to={`/ct_camnang/${article.id}`} className="blog-post-thumbnail" title={article.title}>
+                          <img src={article.image_url} alt={article.title} />
+                        </Link>
                         </div>
                         <div className="article-detail">
                           <div className="article-title">
                             <h3 className="post-title">
-                              <a
-                                href="/blogs/news/paddling-tour"
-                                title="Paddling Tour"
-                              >
-                                Paddling Tour
-                              </a>
+                                <Link to={`/blogs/news/${article.slug}`} title={article.title}>
+                                  {article.title}
+                                </Link>
                             </h3>
                           </div>
 
                           <p className="entry-content">
-                            Banff National Park’s biggest lake allows you to
-                            paddle for miles and enjoy breathtaking views. Lorem
-                            ipsum dolor sit amet.
+                          {article.content}
                           </p>
 
                           <div className="article-post-meta">
-                            <span className="author">bởi: Mai Nguyễn</span>
+                            <span className="author">bởi: {article.author}</span>
                             <span className="date">
-                              <time pubdate datetime="22 Tháng 08, 2024">
+                            <time>{new Date(article.publish_date).toLocaleDateString()}</time>
+                              {/* <time pubdate datetime="22 Tháng 08, 2024">
                                 22 Tháng 08, 2024
-                              </time>
+                              </time> */}
                             </span>
                           </div>
                         </div>
                       </div>
                     </article>
-
-                    <article className="article-loop col-md-6 col-6 col_col">
-                      <div className="article-inner">
-                        <div className="article-image">
-                          <a
-                            href="/blogs/news/mountain-hiking"
-                            className="blog-post-thumbnail"
-                            title="Mountain Hiking"
-                            rel="nofollow"
-                          >
-                            <img
-                              className="lazyload"
-                              src="//file.hstatic.net/200000909393/article/img-68_93702bac2c97447b9475c6bb07a485d8_grande.jpg"
-                              alt="Mountain Hiking"
-                            />
-                          </a>
-                        </div>
-                        <div className="article-detail">
-                          <div className="article-title">
-                            <h3 className="post-title">
-                              <a
-                                href="/blogs/news/mountain-hiking"
-                                title="Mountain Hiking"
-                              >
-                                Mountain Hiking
-                              </a>
-                            </h3>
-                          </div>
-
-                          <p className="entry-content">
-                            With over 1,600 kilometres (994 miles) of trails,
-                            Banff National Park offers adventurers some of the
-                            best hiking on the planet.
-                          </p>
-
-                          <div className="article-post-meta">
-                            <span className="author">bởi: Mai Nguyễn</span>
-                            <span className="date">
-                              <time pubdate datetime="22 Tháng 08, 2024">
-                                22 Tháng 08, 2024
-                              </time>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-
-                    <article className="article-loop col-md-6 col-6 col_col">
-                      <div className="article-inner">
-                        <div className="article-image">
-                          <a
-                            href="/blogs/news/camping-tour"
-                            className="blog-post-thumbnail"
-                            title="Camping Tour"
-                            rel="nofollow"
-                          >
-                            <img
-                              className="lazyload"
-                              src="//file.hstatic.net/200000909393/article/img-70_23537e350baa48c5b65a977c872d0b09_grande.jpg"
-                              alt="Camping Tour"
-                            />
-                          </a>
-                        </div>
-                        <div className="article-detail">
-                          <div className="article-title">
-                            <h3 className="post-title">
-                              <a
-                                href="/blogs/news/camping-tour"
-                                title="Camping Tour"
-                              >
-                                Camping Tour
-                              </a>
-                            </h3>
-                          </div>
-
-                          <p className="entry-content">
-                            Banff offers a range of camping spots allowing you
-                            to experience all of this most gorgeous park’s
-                            outdoor splendour.
-                          </p>
-
-                          <div className="article-post-meta">
-                            <span className="author">bởi: Mai Nguyễn</span>
-                            <span className="date">
-                              <time pubdate datetime="22 Tháng 08, 2024">
-                                22 Tháng 08, 2024
-                              </time>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-
-                    <article className="article-loop col-md-6 col-6 col_col">
-                      <div className="article-inner">
-                        <div className="article-image">
-                          <a
-                            href="/blogs/news/rafting"
-                            className="blog-post-thumbnail"
-                            title="Rafting"
-                            rel="nofollow"
-                          >
-                            <img
-                              className="lazyload"
-                              src="//file.hstatic.net/200000909393/article/firdouss-ross-thsw2pd2gx0-unsplash-550x413_5206e2334e6b4e858a6427694dbee09b_grande.jpg"
-                              alt="Rafting"
-                            />
-                          </a>
-                        </div>
-                        <div className="article-detail">
-                          <div className="article-title">
-                            <h3 className="post-title">
-                              <a href="/blogs/news/rafting" title="Rafting">
-                                Rafting
-                              </a>
-                            </h3>
-                          </div>
-
-                          <p className="entry-content">
-                            Banff offers a range of camping spots allowing you
-                            to experience all of this most gorgeous park’s
-                            outdoor splendour.
-                          </p>
-
-                          <div className="article-post-meta">
-                            <span className="author">bởi: Mai Nguyễn</span>
-                            <span className="date">
-                              <time pubdate datetime="22 Tháng 08, 2024">
-                                22 Tháng 08, 2024
-                              </time>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
+                   ))}
                   </div>
                   <div className="pagination-shop pagi  text-center">
                     <div id="pagination">
                       <ul className="pagination">
-                        <li>
-                          <span className="current">1</span>
+                        {[...Array(totalPages).keys()].map((page) => (
+                        <li  key={page + 1}>
+                              <Link   onClick={() => handlePageChange(page + 1)}
+                                  className={currentPage === page + 1 ? "current" : ""}
+                                  >{page + 1}
+                             </Link>
                         </li>
-                        <li>
-                          <a href="/blogs/news?page=2">2</a>
-                        </li>
-                        <li>
-                          <a href="/blogs/news?page=2">
-                            <i className="fa fa-angle-double-right"></i>
-                          </a>
+                        ))}
+                          <li>
+                            <Link  onClick={() => handlePageChange(currentPage + 1)}>
+                              <i className="fa fa-angle-double-right"></i>
+                            </Link>
                         </li>
                       </ul>
                     </div>
@@ -256,124 +166,40 @@ const CamNang = () => {
               </div>
               <div className="col-lg-3 col-md-12 col-12 boxBlog-right">
                 <aside className="sidebar-blogs blogs-aside--sticky">
-                  {/* <!-- Bai viet moi nhat --> */}
-                  <div className="group-sidebox">
-                    <div className="sidebox-title ">
+                       {/* Bai viet moi nhat */}
+                       <div className="group-sidebox">
+                    <div className="sidebox-title" onClick={toggleLatestPosts}>
                       <h3 className="htitle">Bài viêt mới nhất</h3>
                     </div>
-                    <div className="sidebox-content sidebox-content-togged">
+                    <div
+                      className={`sidebox-content ${isLatestPostsOpen ? 'sidebox-content-togged' : ''}`}
+                    >
                       <div className="list-blogs-latest">
-                        <div className="item-article clearfix ">
-                          <div className="post-image">
-                            <a href="/blogs/news/paddling-tour">
-                              <img
-                                className="lazyload"
-                                src="//file.hstatic.net/200000909393/article/img-69-800x600-1_3f16d7045e9a4dd49d5acc42384a3d5f_compact.jpg"
-                                // src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                                alt="Paddling Tour"
-                              />
-                            </a>
+                        {posts.map((post) => (
+                          <div key={post.id} className="item-article clearfix">
+                            <div className="post-image">
+                              <Link to={`/ct_camnang/${post.id}`}>
+                                <img
+                                  className="lazyload"
+                                  src={post.image_url}
+                                  alt={post.title}
+                                />
+                              </Link>
+                            </div>
+                            <div className="post-content">
+                              <h3>
+                                <a href={``}>{post.title}</a>
+                              </h3>
+                              <p className="post-meta">
+                                <span className="cate">Tin tức</span>
+                                <span className="author d-none">
+                                  <a href={``}></a>
+                                </span>
+                                <span className="date">- {new Date(post.publish_date).toLocaleDateString()}</span>
+                              </p>
+                            </div>
                           </div>
-                          <div className="post-content">
-                            <h3>
-                              <a href="/blogs/news/paddling-tour">
-                                Paddling Tour
-                              </a>
-                            </h3>
-                            <p className="post-meta">
-                              <span className="cate">Tin tức</span>
-                              <span className="author d-none">
-                                <a href="/blogs/news/paddling-tour">
-                                  Mai Nguyễn
-                                </a>
-                              </span>
-                              <span className="date">- 22.08.2024</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="item-article clearfix ">
-                          <div className="post-image">
-                            <a href="/blogs/news/mountain-hiking">
-                              <img
-                                className="lazyload"
-                                src="//file.hstatic.net/200000909393/article/img-68_93702bac2c97447b9475c6bb07a485d8_compact.jpg"
-                                // src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                                alt="Mountain Hiking"
-                              />
-                            </a>
-                          </div>
-                          <div className="post-content">
-                            <h3>
-                              <a href="/blogs/news/mountain-hiking">
-                                Mountain Hiking
-                              </a>
-                            </h3>
-                            <p className="post-meta">
-                              <span className="cate">Tin tức</span>
-                              <span className="author d-none">
-                                <a href="/blogs/news/mountain-hiking">
-                                  Mai Nguyễn
-                                </a>
-                              </span>
-                              <span className="date">- 22.08.2024</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="item-article clearfix ">
-                          <div className="post-image">
-                            <a href="/blogs/news/camping-tour">
-                              <img
-                                className="lazyload"
-                                src="//file.hstatic.net/200000909393/article/img-70_23537e350baa48c5b65a977c872d0b09_compact.jpg"
-                                // src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                                alt="Camping Tour"
-                              />
-                            </a>
-                          </div>
-                          <div className="post-content">
-                            <h3>
-                              <a href="/blogs/news/camping-tour">
-                                Camping Tour
-                              </a>
-                            </h3>
-                            <p className="post-meta">
-                              <span className="cate">Tin tức</span>
-                              <span className="author d-none">
-                                <a href="/blogs/news/camping-tour">
-                                  Mai Nguyễn
-                                </a>
-                              </span>
-                              <span className="date">- 22.08.2024</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="item-article clearfix ">
-                          <div className="post-image">
-                            <a href="/blogs/news/rafting">
-                              <img
-                                className="lazyload"
-                                src="//file.hstatic.net/200000909393/article/firdouss-ross-thsw2pd2gx0-unsplash-550x413_5206e2334e6b4e858a6427694dbee09b_compact.jpg"
-                                // src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-                                alt="Rafting"
-                              />
-                            </a>
-                          </div>
-                          <div className="post-content">
-                            <h3>
-                              <a href="/blogs/news/rafting">Rafting</a>
-                            </h3>
-                            <p className="post-meta">
-                              <span className="cate">Tin tức</span>
-                              <span className="author d-none">
-                                <a href="/blogs/news/rafting">Mai Nguyễn</a>
-                              </span>
-                              <span className="date">- 22.08.2024</span>
-                            </p>
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -381,80 +207,78 @@ const CamNang = () => {
                   {/* <!-- Menu bai viet --> */}
 
                   <div className="group-sidebox">
-                    <div className="sidebox-title ">
-                      <h3 className="htitle">Danh mục bài viết</h3>
+                  <div className="sidebox-title" onClick={toggcata}>
+                      <h3 className="htitle">Menu</h3>
                     </div>
-                    <div className="sidebox-content sidebox-content-togged">
+                    <div className={`sidebox-content ${isLatestCatasOpen ? 'sidebox-content-togged' : ''}`}>
                       <ul className="menuList-links">
                         <li className="">
-                          <a href="/" title="Trang chủ">
+                          <Link to="/" title="Trang chủ">
                             <span>Trang chủ</span>
-                          </a>
+                          </Link>
                         </li>
 
                         <li className="">
-                          <a href="/pages/about-us" title="Về Maple Inn">
-                            <span>Về Maple Inn</span>
-                          </a>
+                          <Link to="#" title="Về Paradiso">
+                            <span>Về Paradiso</span>
+                          </Link>
                         </li>
 
                         <li className="">
-                          <a href="/pages/rooms" title="Phòng">
+                          <Link to="/phong" title="Phòng">
                             <span>Phòng</span>
-                          </a>
+                          </Link>
                         </li>
 
                         <li className="has-submenu level0 ">
-                          <a
-                            href="/pages/nha-hang"
-                            title="Dịch vụ tại Maple Inn"
+                         <Link to="/dichvu"
+                            title="Dịch vụ tại Paradiso"
                           >
-                            Dịch vụ tại Maple Inn{" "}
+                            Dịch vụ tại Paradiso
                             <span className="icon-plus-submenu plus-nClick1"></span>
-                          </a>
+                          </Link>
                           <ul className="submenu-links">
                             <li>
-                              <a href="/pages/nha-hang" title="Nhà hàng">
+                            <Link to="#" title="Nhà hàng">
                                 Nhà hàng
-                              </a>
+                              </Link >
                             </li>
 
                             <li>
-                              <a
-                                href="/pages/tiec-su-kien"
+                               <Link to="#"
                                 title="Tiệc & Sự kiện"
                               >
                                 Tiệc & Sự kiện
-                              </a>
+                              </Link>
                             </li>
 
                             <li>
-                              <a
-                                href="/pages/spa-massage"
+                              <Link
+                                to=""
                                 title="Spa & Massage"
                               >
                                 Spa & Massage
-                              </a>
+                              </Link>
                             </li>
                           </ul>
                         </li>
 
                         <li className=" active ">
-                          <a href="/blogs/news" title="Cẩm nang du lịch">
+                        <Link to="/cn_dulich" title="Cẩm nang du lịch">
                             <span>Cẩm nang du lịch</span>
-                          </a>
+                          </Link>
                         </li>
 
                         <li className="">
-                          <a href="/pages/about-us" title="Giới thiệu">
+                        <Link to="/gioithieu" title="Giới thiệu">
                             <span>Giới thiệu</span>
-                          </a>
+                          </Link>
                         </li>
 
                         <li className="">
-                          <a href="/pages/lien-he" title="Liên hệ">
+                          <Link to="/lienhe" title="Liên hệ">
                             <span>Liên hệ</span>
-                          </a>
+                          </Link>
                         </li>
                       </ul>
                     </div>

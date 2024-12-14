@@ -217,30 +217,21 @@ function Ud_Infor_User() {
           <div className="thongtin">
             <div className="box_user">
                 <div className="profile-container_infor_nguoidung">
-                      <div className="profile-card_infor_nguoidung">
-                      <div className="profile-avatar_infor_nguoidung">
-                      <img src={imageUrl || defaultAvatar} alt="Avatar" />
-                        <div
-                          className="change-avatar-icon"
-                          onClick={() => document.getElementById("avatarInput").click()}
-                        >
-                          <i className="fa-regular fa-image"></i>
-                          <input
-                            hidden
-                            id="avatarInput"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                          />
+                    <div className="profile-avatar_infor_nguoidung">
+                        <div className="profile-avatar_infor_nguoidung_img">
+                          <img src={imageUrl || defaultAvatar} alt="Avatar" />
                         </div>
+                        <div className="change-avatar-icon" onClick={() => document.getElementById("avatarInput").click()}>
+                          <i className="fa-regular fa-image"></i>
+                        </div>
+                        <input hidden id="avatarInput" type="file" accept="image/*" onChange={handleFileChange}/>
                     </div>
-                          <div className="profile-info_infor_nguoidung">
-                              <h2>{user.id_user}. {user.ten_user}</h2>
-                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
-                              <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-envelope"></i></span>  {user.email_user}</p>
-                          </div>
-                      </div>
-                </div>
+                    <div className="profile-info_infor_nguoidung">
+                      <h2>{user.id_user}. {user.ten_user}</h2>
+                      <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-phone"></i> </span> {user.sdt_user}</p>
+                      <p><span className="icon_infor_nguoidung"><i class="fa-solid fa-envelope"></i></span>  {user.email_user}</p>
+                  </div>
+                </div>          
             </div>
             <div className="box_link">
               <Link to={'/infor_user'} className="tab_item active">

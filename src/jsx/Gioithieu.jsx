@@ -43,7 +43,7 @@ const Gioithieu = () => {
                     <p class="heading_desc">  Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.</p>
                 </div>
                   {/* Image Row Section */}
-                <section className="image-row-section min_warp2">
+                <section className="image-row-section min_warp2" data-aos="fade-up" data-aos-duration="2500">
                     <div className="image-row">
                         <div className="image-item">
                             <img 
@@ -72,7 +72,7 @@ const Gioithieu = () => {
 
             {/* Banner Below Images */}
            <div className="bg_banner_bottom">
-                <section className="banner-bottom">
+                <section className="banner-bottom" data-aos="fade-up" data-aos-duration="3000">
                     <div className="banner-text-bottom">
                         <h3>TẬN HƯỞNG KỲ NGHỈ CỦA BẠN TẠI PARADISO</h3>
                         <h2 class="title2">Hãy tận hưởng kỳ nghỉ thoải mái của bạn tại trung tâm khu rừng xinh đẹp</h2>
@@ -111,7 +111,7 @@ const Gioithieu = () => {
               <div className="row8 row_gioithieu">
                 <div class="col-lg-6 col-12 about-content">
                     <div class="heading-title">
-                        <p class="title1">Trải nghiệm lưu trú tuyệt vời tại Maple Inn</p>
+                        <p class="title1">Trải nghiệm lưu trú tuyệt vời tại Paradiso</p>
                         <h2 class="title2">Phòng nghỉ tự nhiên và nhà gỗ riêng</h2>
                         <p class="heading_desc">Nằm giữa lòng khu nghỉ dưỡng, trên rìa của một những con dốc yên tĩnh và xinh đẹp, Maple Inn là thiên đường ấm áp, tĩnh lặng và trẻ hóa. Tắm mình trong ánh nắng rực rỡ và bầu trời trong xanh, nơi đây có tầm nhìn tuyệt đẹp ra những bãi biển rợp bóng cọ và rạn san hô tuyệt đẹp.</p>
                     </div>              
@@ -168,7 +168,7 @@ const Gioithieu = () => {
                     </ul>
                </div>
               </div>
-              <section className="content-boxess">
+              <section className="content-boxess" data-aos="fade-up" data-aos-duration="2500">
                     <div className="image-box">
                         <img
                             src="https://theme.hstatic.net/200000909393/1001269498/14/about_us_3_banner_1.jpg?v=2537" 
@@ -199,11 +199,14 @@ const Gioithieu = () => {
               
         
 {/* <!-- service --> */}
-            <div className="bg_service" data-aos="fade-up" data-aos-duration="1500">
+            <div className="bg_service" >
                 <div className="min_warp2">
                     <div className="row_warp">
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_1.jpg?v=2537" alt="Dịch vụ đưa đón tại sân bay"/>
                                 </div>
@@ -214,7 +217,10 @@ const Gioithieu = () => {
                             </div>
                         </div>                
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_2.jpg?v=2537" alt="Dịch vụ quản gia"/>
                                 </div>
@@ -225,7 +231,10 @@ const Gioithieu = () => {
                             </div>
                         </div>      
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_3.jpg?v=2537" alt="Wifi &amp; Internet"/>
                                 </div>
@@ -236,7 +245,10 @@ const Gioithieu = () => {
                             </div>
                         </div>       
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_4.jpg?v=2537" alt="Dịch vụ giặt ủi"/>
                                 </div>
@@ -247,7 +259,10 @@ const Gioithieu = () => {
                             </div>
                         </div>           
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_5.jpg?v=2537" alt="Bữa sáng tại phòng"/>
                                 </div>
@@ -258,7 +273,10 @@ const Gioithieu = () => {
                             </div>
                         </div>              
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_6.jpg?v=2537" alt="Chỗ đậu xe riêng"/>
                                 </div>

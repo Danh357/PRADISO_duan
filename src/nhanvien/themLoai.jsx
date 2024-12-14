@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ThemLoai() {
     const navigate = useNavigate(); // Sử dụng useNavigate trong function component
     const [sp, setSp] = useState({
+        id_Loai: '',
         ten_Loai: '',
         Mo_Ta: ''
     });
@@ -30,6 +31,16 @@ function ThemLoai() {
         <h2>Thêm Loại Homestay</h2>
         <form>
             <div className="form-group_admin_pra">
+                <label htmlFor="categoryId">Id Loại Homestay</label>
+                <input
+                    type="number"
+                    id="categoryId"
+                    name="categoryId"
+                    required
+                    onChange={e => setSp({ ...sp, id_Loai: e.target.value })}
+                />
+            </div>
+            <div className="form-group_admin_pra">
                 <label htmlFor="categoryName">Tên Loại Homestay</label>
                 <input
                     type="text"
@@ -51,14 +62,12 @@ function ThemLoai() {
             </div>
             <div className="form-group_admin_pra">
                 <button className="btn btn-warning" type="button" onClick={submitDuLieu}>
-                    Thêm loại
+                    Thêm loại Homestay
                 </button>
                 &nbsp;
-                <button className="btn btn-warning">
-                <Link to="/admin_loaihomestay" className="btn btn-info">
+                <a href="/admin_loaihomestay" className="btn btn-info">
                     Danh sách
-                </Link>
-                </button>
+                </a>
             </div>
         </form>
     </div>

@@ -5,19 +5,7 @@ import { Link } from 'react-router-dom';
 
 function Thich() {
     const navigate = useNavigate();
-    // const { id } = useParams();
-    // const [showyeuthich, setHomestay] = useState(null);
-    // const [error, setError] = useState(null);
-
-    // useEffect(() => {
-    //     axios.get(`http://localhost:3000/yeuthich`)
-    //         .then(response => {
-    //             setHomestay(response.data);
-    //         })
-    //         .catch(err => {
-    //             setError("Lỗi khi tải dữ liệu homestay");
-    //         });
-    // }, [id]);
+    const [images, setImages] = useState([]); // Hình ảnh homestay
     const [favorites, setFavorites] = useState([]);
     useEffect(() => {
         // Lấy danh sách yêu thích từ localStorage khi component được mount
@@ -44,6 +32,24 @@ function Thich() {
   const handleGoBack = () => {
     navigate(-1); // Giá trị -1 nghĩa là quay lại trang trước
   };
+
+  
+    // Hàm fetch hình ảnh homestay
+    const fetchHomestayImages = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/dshinhanh');
+          if (!response.ok) throw new Error('Network response was not ok');
+          const data = await response.json();
+          setImages(data); // Đặt dữ liệu vào state
+        } catch (error) {
+          console.error('Failed to fetch images:', error);
+        }
+      };
+      
+      // Fetch hình ảnh khi component mount
+      useEffect(() => {
+        fetchHomestayImages();
+      }, []);
 
     return (
 <div className="danhs1">
@@ -108,26 +114,38 @@ function Thich() {
                     <ul id="content1" className=" tab_pro_list flex" >
                             {favorites.map((homestay) => (
                         <li className="tab_pro_item" key={homestay.id_homestay}>
-                            <Link to={''}>
-                                <figure>
-                                    <img src="../image/chitiet1.png" alt=""/>
-                                    <img src="../image/chitiet3.png" alt=""/>
-                                </figure>
-                                <div className="button_sale">
-                                    <h3>{homestay.ten_homestay}</h3>
-                                    <div className="sale_price">
-                                        <div className="new_price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
-                                    </div>
-                                    <div className="product_button">
-                                        <button name="#" className="btn_sale">
-                                           <Link> <span>Đặt Homestay</span>     </Link>        
-                                        </button>
-                                        <button name="#" className="btn_sale" onClick={() => removeFromFavorites(homestay.id_homestay)}>
-                                            <span>xóa</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </Link>
+                            {images.length > 0 ? (
+                                images.map((image, index) => {
+                                    if (homestay.id_homestay === image.id_hinh) {
+                                        return (
+                                        <Link to={''}>
+                                            <figure>
+                                                <img src={image.url_hinh} alt=""/>
+                                                <img src={image.url_hinh} alt=""/>
+                                            </figure>
+                                            
+                                            <div className="button_sale">
+                                                <h3>{homestay.ten_homestay}</h3>
+                                                <div className="sale_price">
+                                                    <div className="new_price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+                                                </div>
+                                                <div className="product_button">
+                                                    <button name="#" className="btn_sale">
+                                                    <Link to={"/homestay/" + homestay.id_homestay}> <span>Xem chi tiết</span>     </Link>        
+                                                    </button>
+                                                    <button name="#" className="btn_sale" onClick={() => removeFromFavorites(homestay.id_homestay)}>
+                                                        <span>xóa</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                  );
+                                }
+                                return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
+                                })
+                            ) : (
+                                <p>Không có hình để hiển thị</p>
+                            )}
                         </li>
                       
                         

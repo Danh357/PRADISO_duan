@@ -91,7 +91,7 @@ const SuaHomestay = () => {
             .then(data => {
                 console.log('Update response:', data); // Debug
                 alert('Cập nhật homestay thành công!');
-                navigate('/admin_danhsach'); // Điều hướng về trang danh sách
+                navigate('/admin_homestay'); // Điều hướng về trang danh sách
             })
             .catch(error => console.error('Có lỗi xảy ra:', error));
     };
@@ -139,18 +139,15 @@ const SuaHomestay = () => {
         </div>
         <div className="form-group_admin_pra">
             <label htmlFor="trangThai">Trạng Thái</label>
-            <select
-                id="trangThai"
-                name="TrangThai"
+            <input 
+                type="text" 
+                id="trangThai" 
+                name="TrangThai" 
                 className="form-control"
-                value={sp.TrangThai || ''}
-                onChange={handleChange}
+                value={sp.TrangThai || ''} 
+                onChange={handleChange} 
                 required
-            >
-                <option value="">Chọn trạng thái</option>
-                <option value="Còn phòng">Còn phòng</option>
-                <option value="Hết phòng">Hết phòng</option>
-            </select>
+            />
         </div>
         <div className="form-group_admin_pra">
             <label htmlFor="urlHinh">URL Hình</label>
@@ -170,10 +167,12 @@ const SuaHomestay = () => {
                 type="button" 
                 onClick={submitDuLieu}
             >
-                Cập nhật
+                Cập nhật Homestay
             </button>
             &nbsp;
-            <button className="btn btn-warning" type="button" ><a href="/admin_danhsach" className="btn btn-info">Danh sách</a></button> 
+            <a href="/admin_homestay" className="btn btn-info">
+                Danh sách Homestay
+            </a>
         </div>
     </form>
 </div>

@@ -1,16 +1,16 @@
-// Layout.js
-import React from 'react';
-import Header_admin from '../admin/Header_admin.jsx'
-
-
-
+// Layout_admin.js
+import React from "react";
+import Slide_admin from "../admin/Slide_admin"; // Đảm bảo đường dẫn đúng
+import Nav_admin from "../admin/nav_admin";
 
 const Layout_admin = ({ children }) => {
   return (
-    <div>
-      <Header_admin />
-      {children} {/* Các trang hợp lệ sẽ được render tại đây */}
-
+    <div className="admin_wap">
+      <header className="head_admin">
+        <Nav_admin />
+        <div className="admin_main">{children}</div>
+        <Slide_admin />
+      </header>
     </div>
   );
 };

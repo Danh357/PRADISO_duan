@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation  } from 'react-router-dom';
 import { NavLink } from "react-router-dom";
 function Header() {
     const [active, setActive] = useState(false);
@@ -17,7 +17,8 @@ function Header() {
     const storedUser = JSON.parse(localStorage.getItem('auth'));
     const [imageUrl, setImageUrl] = useState(null); // Thêm state này ở đầu file component
     const defaultAvatar = '../../image/user2.png';
-
+    const location = useLocation(); // Lấy thông tin đường dẫn hiện tại
+    const [isVisible, setIsVisible] = useState(false);
     
     //kiem tra nguoi dung dang nhap
     useEffect(() => {
@@ -63,11 +64,14 @@ function Header() {
     //dang xuat
 
     const handleLogout = () => {
-        // Xóa thông tin người dùng khi đăng xuất
-        localStorage.removeItem('auth');
-        setIsLoggedIn(false);
-        setUser(null);
-        navigate('/');
+        const confirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+        if (confirmed) {
+            // Xóa thông tin người dùng khi đăng xuất
+            localStorage.removeItem("auth");
+            setIsLoggedIn(false);
+            setUser(null);
+            navigate("/");
+        }
     };
 
     // Đóng dropdown nếu người dùng nhấp bên ngoài
@@ -85,8 +89,8 @@ function Header() {
 
     //yeuthich
     const updateFavoriteCount = () => {
-      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      setFavoriteCount(favorites.length);
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    setFavoriteCount(favorites.length);
     };
       useEffect(() => {
       // Cập nhật số lượng yêu thích khi component được render lần đầu
@@ -105,9 +109,43 @@ function Header() {
       };
      // reload trang
      const handleLogoClick = () => {
-        window.location.href = "/";
-    };
+        const checkbox = document.getElementById('click_open_close');
+        if (checkbox) checkbox.checked = false; // Đóng thanh sidebar
+      };
+    useEffect(() => {
+        // Đóng sidebar mỗi khi URL thay đổi
+        const checkbox = document.getElementById('click_open_close');
+        if (checkbox) {
+          checkbox.checked = false; // Đặt lại trạng thái checkbox
+        }
+      }, [location]); // Kích hoạt khi `location` thay đổi
 
+     
+    // Xử lý sự kiện cuộn
+    useEffect(() => {
+        const handleScroll = () => {
+        if (window.scrollY > 1500) {
+            setIsVisible(true); // Hiển thị nút
+        } else {
+            setIsVisible(false); // Ẩn nút
+        }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        // Dọn dẹp sự kiện khi component bị tháo
+        return () => {
+        window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
+    // Xử lý cuộn lên đầu trang
+    const scrollToTop = () => {
+        window.scrollTo({
+        top: 0,
+        behavior: "smooth", // Cuộn mượt mà
+        });
+    };
     return(
         <header>
         <div className="bg_menu" data-aos="fade" data-aos-easing="linear" data-aos-duration="700">
@@ -249,7 +287,23 @@ function Header() {
                             </div>
                             <div className="dkdn_mb">
                             {isLoggedIn ? (
-                                    <p onClick={handleLogoClick} className="t_dkdn_mb"><Link to={'/infor_user'} >Chào {user?.ten_user}!</Link></p>
+                                      <div className="user-actions">
+                                      <span onClick={handleLogoClick} className="t_dkdn_mb">
+                                        <Link to={'/infor_user'}>Chào {user?.ten_user}!</Link>
+                                      </span>
+                                      <ul className="user-menu">
+                                        <li>
+                                          <Link to={'/infor_user'} onClick={handleLogoClick}>
+                                            Hồ sơ cá nhân
+                                          </Link>
+                                        </li>
+                                        <li className='log_out'>
+                                          <button onClick={handleLogout} className="logout-button">
+                                            Đăng xuất
+                                          </button>
+                                        </li>
+                                      </ul>
+                                    </div>
                                 ) : (
                                     <p className="t_dkdn_mb">Đăng nhập để hưởng những đặc quyền dành riêng cho thành viên.</p>
                                 )}
@@ -259,16 +313,16 @@ function Header() {
                                 <ul className="menu_mobile">
                                     <li onClick={handleLogoClick} ><Link to={'/'} className="active" >Trang chủ</Link></li>
                                     <li className="has-submenu">
-                                        <Link to={''} className={"submenu-toggle" + (active ? ' active' : '')} >Về Paradico <span onClick={() => setActive(!active)}><i className="fa-light fa-chevron-down"></i></span></Link>
+                                        <a className={"submenu-toggle" + (active ? ' active' : '')} >Về Paradico <span onClick={() => setActive(!active)}><i className="fa-light fa-chevron-down"></i></span></a>
                                         <ul className={"submenu_mobile" + (active ? ' active' : '')}>
-                                            <li><Link to={''}>lịch sử ra đời</Link></li>
+                                            <li onClick={handleLogoClick} ><Link to={''}>lịch sử ra đời</Link></li>
                                         </ul>
                                     </li>
-                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Phòng</Link></li>
-                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Dịch vụ</Link></li>
-                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Cẩm nang du lịch</Link></li>
-                                    <li onClick={handleLogoClick}><Link to={'/phong'}>Giới thiệu</Link></li>
-                                    <li onClick={handleLogoClick}><Link to={'/lienhe'}>Liên hệ</Link></li>
+                                    <li ><Link to={'/phong'}>Phòng</Link></li>
+                                    <li ><Link to={'/dichvu'}>Dịch vụ</Link></li>
+                                    <li ><Link to={'/cndulich'}>Cẩm nang du lịch</Link></li>
+                                    <li ><Link to={'/gioithieu'}>Giới thiệu</Link></li>
+                                    <li ><Link to={'/lienhe'}>Liên hệ</Link></li>
                                 </ul>
                                 <ul className="list_social_rwd">
                                     <li>
@@ -299,6 +353,8 @@ function Header() {
                 </div>
             </div>
         </div>
+        <button  id="scrollToTop" className={`scroll-to-top ${isVisible ? "show" : ""}`} onClick={scrollToTop}><i class="fa-solid fa-arrow-up"></i></button>
+        
        </header>
     )
 }

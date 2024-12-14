@@ -4,35 +4,56 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Link,useNavigate,useParams } from 'react-router-dom';
+import { Link,useNavigate,useParams,useLocation  } from 'react-router-dom';
+
+
 import DanhGia from './danhgia';
 const ChiTiet = () => {
-    const [checkInDate, setCheckInDate] = useState(new Date()); // Ngày nhận phòng mặc định là hôm nay
-    const [checkOutDate, setCheckOutDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1))); // Ngày trả phòng mặc định là ngày mai
+
     const [totalPrice, setTotalPrice] = useState(0);
     const { id } = useParams();
+    const [dateError, setDateError] = useState("");
+    const location = useLocation();
+    // Lấy giá trị checkIn và checkOut từ URL
+    const queryParams = new URLSearchParams(location.search);
+    const checkInParam = queryParams.get('checkIn');
+    const checkOutParam = queryParams.get('checkOut');
+    // Chuyển các tham số từ URL thành đối tượng Date
+    const [checkInDate, setCheckInDate] = useState(checkInParam ? new Date(checkInParam) : new Date());
+    const [checkOutDate, setCheckOutDate] = useState(checkOutParam ? new Date(checkOutParam) : new Date(new Date().setDate(new Date().getDate() + 1)));
+
+    
     const storedUser = JSON.parse(localStorage.getItem('auth'));
-    const [homestayCT, setHomestay] = useState(null);
+    const [homestayCT, setHomestay] = useState({});
     const [error, setError] = useState(null);
     const [rooms, setRooms] = useState([]);
     const [images, setImages] = useState([]); // Hình ảnh homestay
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
-      // State tạm để lưu dữ liệu booking
-    // const [preparedBookingData, setPreparedBookingData] = useState(null);
-    const [errorMessage, setErrorMessage] = useState("");
     const [isNotificationVisible, setNotificationVisible] = useState(false);
     const [timeLeft, setTimeLeft] = useState(5);
     const [existingFavorites, setExistingFavorites] = useState([]);
-    const handleCheckInDateChange = (date) => { setCheckInDate(date);
-    // Tự động cập nhật ngày check-out
-    const updatedCheckout = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-        setCheckOutDate(updatedCheckout);
+    const [notificationMessage, setNotificationMessage] = useState(""); // Thông báo
+
+
+
+    // Kiểm tra và hiển thị lỗi nếu ngày trả phòng nhỏ hơn hoặc bằng ngày nhận phòng
+    useEffect(() => {
+    if (checkOutDate && checkInDate && checkOutDate <= checkInDate) {
+        setDateError("Ngày trả phòng phải sau ngày nhận phòng.");
+    } else {
+        setDateError("");
+    }
+    }, [checkInDate, checkOutDate]);
+
+    // Hàm định dạng ngày để gửi vào input hidden
+    const formatDateForInput = (date) => {
+    if (!date) return "";
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
     };
-  
-
-    
-
 // Hàm fetch hình ảnh homestay
     const fetchHomestayImages = async () => {
       try {
@@ -60,9 +81,7 @@ const ChiTiet = () => {
                 setError("Lỗi khi tải dữ liệu homestay");
             });
     }, [id]);
-    console.log(id);
     
-
 //san pham lien quan
     useEffect(() => {
         const fetchRooms = async () => {
@@ -155,74 +174,87 @@ const ChiTiet = () => {
 //     }
     
 // };
-const [notificationMessage, setNotificationMessage] = useState(""); // Thông báo
 
-useEffect(() => {
-    // Lấy danh sách yêu thích từ localStorage mỗi khi component mount hoặc sau khi dữ liệu thay đổi
-    const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setExistingFavorites(savedFavorites);
-  }, []); // Đảm bảo chỉ chạy 1 lần khi component mount
-
-  useEffect(() => {
-    // Thực hiện đếm ngược khi thông báo được hiển thị
+    useEffect(() => {
     let countdownInterval;
+
     if (isNotificationVisible) {
-      setTimeLeft(5); // Đặt lại thời gian khi thông báo hiển thị
-      countdownInterval = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime === 1) {
+        // Đặt lại thời gian mỗi khi thông báo xuất hiện
+        setTimeLeft(10); // Đặt lại bộ đếm về 5 giây
+
+        countdownInterval = setInterval(() => {
+        setTimeLeft(prevTime => {
+            if (prevTime === 1) {
             setNotificationVisible(false); // Ẩn thông báo khi hết thời gian
             return 0;
-          }
-          return prevTime - 1;
+            }
+            return prevTime - 1;
         });
-      }, 1000);
-    }
-    return () => clearInterval(countdownInterval); // Dọn dẹp khi component unmount
-  }, [isNotificationVisible]);
-
-  const addToFavorites = () => {
-    if (!storedUser) {
-      // Nếu chưa đăng nhập, yêu cầu đăng nhập
-      const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
-      if (goToLogin) {
-        window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
-      }
-      return;
+        }, 1000);
     }
 
-    if (homestayCT) {
-      try {
-        const updatedFavorites = [...existingFavorites];
-        const isFavorite = updatedFavorites.some(item => item.id_homestay === homestayCT.id_homestay);
+    return () => clearInterval(countdownInterval); // Dọn dẹp khi component unmount hoặc trạng thái thay đổi
+    }, [isNotificationVisible]);
 
-        if (!isFavorite) {
-          // Nếu sản phẩm chưa có trong danh sách yêu thích, thêm vào
-          updatedFavorites.push(homestayCT);
-          localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-          setExistingFavorites(updatedFavorites); // Cập nhật state với danh sách mới
-          setNotificationMessage("Sản phẩm đã được thêm vào danh sách yêu thích!"); // Thông báo thành công
-        } else {
-          // Nếu sản phẩm đã có trong danh sách yêu thích, hiển thị thông báo
-          setNotificationMessage("Sản phẩm này đã có trong danh sách yêu thích."); // Thông báo đã có
+//thích
+    const addToFavorites = () => {
+        if (!storedUser) {
+            // Nếu chưa đăng nhập, yêu cầu đăng nhập
+            const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
+            if (goToLogin) {
+                window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+            }
+            return;
         }
-        setNotificationVisible(true); // Hiển thị thông báo
-      } catch (error) {
-        console.error("Lỗi khi xử lý dữ liệu yêu thích:", error);
-        setNotificationMessage("Có lỗi xảy ra khi thêm sản phẩm vào yêu thích."); // Thông báo lỗi
-        setNotificationVisible(true);
-      }
-    }
-  };
 
-  const handleContinueShopping = () => {
-    setNotificationVisible(false); // Tắt thông báo
-  };
-const handleGoToCart = () => {
-    window.location.href = '/thich'; // Điều hướng đến trang đăng nhập
-};
+        if (!homestayCT) {
+            console.error("Không có thông tin homestayCT");
+            return;
+        }
+
+        try {
+            // Lấy danh sách hiện tại từ localStorage
+            const existingFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+            
+            // Kiểm tra xem homestay đã có trong danh sách chưa
+            const isFavorite = existingFavorites.some(item => item.id_homestay === homestayCT.id_homestay);
+
+            if (!isFavorite) {
+                // Thêm mới vào danh sách yêu thích
+                const updatedFavorites = [...existingFavorites, homestayCT];
+                localStorage.setItem("favorites", JSON.stringify(updatedFavorites)); // Lưu vào localStorage
+                setExistingFavorites(updatedFavorites); // Cập nhật lại state
+                setNotificationMessage("Sản phẩm đã được thêm vào danh sách yêu thích!"); // Thông báo thành công
+            } else {
+                setNotificationMessage("Sản phẩm này đã có trong danh sách yêu thích."); // Thông báo đã có
+            }
+
+            setNotificationVisible(true); // Hiển thị thông báo
+            console.log("Danh sách yêu thích trong localStorage:", JSON.parse(localStorage.getItem("favorites")));
+        } catch (error) {
+            console.error("Lỗi khi xử lý dữ liệu yêu thích:", error);
+            setNotificationMessage("Có lỗi xảy ra khi thêm sản phẩm vào yêu thích.");
+            setNotificationVisible(true);
+        }
+    };
+
+    const handleContinueShopping = () => {
+        setNotificationVisible(false); // Tắt thông báo
+    };
+
+    const handleGoToCart = () => {
+        window.location.href = '/thich'; // Điều hướng đến trang đăng nhập
+    };
+
     const swiperRef = useRef(null); 
-  
+    //dat homestay
+    const handleInputChange = (e) => {  
+    const { name, value } = e.target;
+    setUser((prevUser) => ({
+        ...prevUser,
+        [name]: value
+    }));
+    };
 // Lấy thông tin người dùng khi component tải
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
@@ -280,74 +312,88 @@ const handleGoToCart = () => {
 // Lấy thông tin người dùng khi component tải
 
     useEffect(() => {
-        // Tính tổng tiền
-        if (homestayCT?.gia_homestay && checkInDate && checkOutDate) {
-            const oneDay = 24 * 60 * 60 * 1000;
-            const numberOfDays = Math.ceil((checkOutDate - checkInDate) / oneDay);
-
-            if (numberOfDays > 0) {
-                setTotalPrice(homestayCT.gia_homestay * numberOfDays);
-                setErrorMessage("");
-            } else {
-                setTotalPrice(0);
-                setErrorMessage("Ngày trả phòng phải sau ngày nhận phòng.");
-            }
+        if (!checkInDate || !checkOutDate || !homestayCT.gia_homestay) {
+            setTotalPrice(0);
+            return;
         }
-    }, [checkInDate, checkOutDate, homestayCT]);
 
-    
+        if (new Date(checkOutDate) <= new Date(checkInDate)) {
+            setDateError("Ngày trả phòng phải lớn hơn ngày nhận phòng!");
+            setTotalPrice(0);
+            return;
+        }
 
-    const handleSubmit = (e) => {
-        
+        setDateError("");
+
+        const timeDiff = Math.abs(new Date(checkOutDate) - new Date(checkInDate));
+        const daysStayed = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        const total = daysStayed * homestayCT.gia_homestay;
+
+        setTotalPrice(total);
+    }, [checkInDate, checkOutDate, homestayCT.gia_homestay]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
     
         if (!user) {
-        alert('Bạn cần đăng nhập để đặt phòng!');
-        return;
+            alert('Bạn cần đăng nhập để đặt phòng!');
+            return;
         }
     
         if (!checkInDate || !checkOutDate) {
-        alert('Bạn cần chọn ngày nhận và ngày trả phòng.');
-        return;
+            alert('Bạn cần chọn ngày nhận và ngày trả phòng.');
+            return;
         }
+    
         // Kiểm tra logic ngày trả phòng không hợp lệ
         if (checkInDate.getTime() >= checkOutDate.getTime()) {
             alert("Ngày trả phòng phải sau ngày nhận phòng. Vui lòng chọn lại.");
             return;
         }
-
+    
         // Kiểm tra tổng tiền
         if (totalPrice <= 0) {
             alert("Tổng tiền không hợp lệ. Vui lòng kiểm tra lại ngày nhận và trả phòng.");
             return;
         }
+    
         const bookingData = {
-        id_homestay: homestayCT.id_homestay,
-        ten_homestay: homestayCT.ten_homestay,
-        gia_homestay: homestayCT.gia_homestay,
-        ngay_dat: checkInDate.toISOString().split('T')[0], // Chuyển đổi ngày theo định dạng "yyyy-MM-dd"
-        id_user: user.id_user,
-        ngay_tra: checkOutDate.toISOString().split('T')[0], // Chuyển đổi ngày theo định dạng "yyyy-MM-dd"
-        tong_tien_dat: totalPrice,
+            id_homestay: homestayCT.id_homestay,
+            id_user: user.id_user,
+            ten_user: user.ten_user,
+            sdt_user: user.sdt_user,
+            email_user: user.email_user,
+            ngay_dat: checkInDate
+                ? checkInDate.toLocaleDateString("en-GB") // Định dạng thành DD/MM/YYYY
+                : "",
+            ngay_tra: checkOutDate
+                ? checkOutDate.toLocaleDateString("en-GB") // Định dạng thành DD/MM/YYYY
+                : "",
+            gia_homestay: homestayCT.gia_homestay,
+            tong_tien_dat: totalPrice,
         };
-        localStorage.setItem('bookingData', JSON.stringify(bookingData));
-        window.confirm('Mời bạn đến xác nhận đơn hàng.');
-        navigate(`/thanhtoan`);
-        // navigate(`/thanhtoan/${homestayCT.id_homestay}`);
-
-        console.log(bookingData);
+    
+        try {
+            const response = await axios.post('http://localhost:3000/booking/homestay', bookingData);
+            console.log('Đặt phòng thành công:', response.data.message);
+            alert('Đặt phòng thành công!');
+            navigate('/phong');
+        } catch (error) {
+            console.error('Lỗi khi đặt phòng:', error.response?.data || error.message);
+            if (error.response?.data?.error) {
+                alert(error.response.data.error); // Hiển thị lỗi từ backend
+            } else {
+                alert('Đã xảy ra lỗi khi đặt phòng. Vui lòng thử lại.');
+            }
+        }
     };
+      // Hàm quay lại trang trước đó
+    const handleGoBack = () => {
+        navigate(-1); // Giá trị -1 nghĩa là quay lại trang trước
+    };
+  
+  
 
-  
-  
-//dat homestay
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevUser) => ({
-      ...prevUser,
-      [name]: value
-    }));
-  };
 
     if (error) return <p>{error}</p>;
     if (!homestayCT) return <p>Loading...</p>;
@@ -377,7 +423,11 @@ const handleGoToCart = () => {
                                                         <img src={image.url_hinh || "../../image/banner.jpg"} alt="Thumbnail 4" />
                                                     </div>
                                                 </div>
+                                                <div className="back_page" >
+                                                    <button  onClick={handleGoBack} className="accept-button">Trở lại</button>
+                                                </div>
                                             </div>
+                                            
                                         );
                                     }
                                     return null; // Ensures a return statement if condition is not met
@@ -393,7 +443,12 @@ const handleGoToCart = () => {
                                 <div className="d-flex flex-wrap">
                                     <div className="col-lg-8 col-md-12 col-12 wrapbox-left">
                                         <div class="proloop-detail chitiet">
-                                            <h3><Link to="">{homestayCT.ten_homestay}</Link></h3>
+                                            <h3><Link to="">{homestayCT.ten_homestay}</Link></h3> 
+                                            <div className="gift-tag">
+                                                <div className={`thongbao_tag ${homestayCT.TrangThai === 'Còn phòng' ? 'available' : 'sold-out'}`}>
+                                                    {homestayCT.TrangThai}
+                                                </div>
+                                            </div>
                                             <div class="pro-tag">
                                                 <div class="tag-item tag-area">
                                                     <span>150</span> <span class="tag-unit">m<sup>2</sup></span>
@@ -428,8 +483,9 @@ const handleGoToCart = () => {
                                             <div className="product-price" id="price-preview">
                                                 <span className="pro-title">ĐẶT PHÒNG: </span>
                                                 <div className="pro-price-chitiet no-sale">
-                                                    <div className="percent-price">
-                                                        <span className="price">{homestayCT.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}<span className="person">/ Đêm</span></span>
+                                                <div className="percent-price">
+                                                        <span className="price">{homestayCT && homestayCT.gia_homestay ? 
+                                                        Number(homestayCT.gia_homestay).toLocaleString('vi') : 'Chưa có giá'}<span className="person">/ Đêm</span></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -440,156 +496,164 @@ const handleGoToCart = () => {
                                                         <select id="product-select" name="id" style={{ display: 'none' }}>
                                                             <option value="1128215632">Default Title - 3,200,000₫</option>
                                                         </select>
-                                                    </div>
+                                                      </div>
                                                    
                                                 </form>
                                             </div> */}
+                                            {homestayCT.TrangThai === 'hết phòng' ? (
+                                            <div className="sold-out-message red-text">
+                                            <p>Homestay này đã hết phòng. Vui lòng chọn homestay khác.</p>
+                                            </div>
+                                        ) : (
                                             <div className="form-booking_chitiet">
-                                                <form id="formbooking" onSubmit={handleSubmit}>
+                                            <form id="formbooking" onSubmit={handleSubmit}>
                                                 {!user ? (
-                                                        <div>
-                                                       <p style={{ fontSize: '16px', textAlign: 'center' }}>
-                                                            Bạn cần <Link to="/dk_dn" style={{ textDecoration: 'underline', color: 'blue' }}>Đăng nhập</Link> để đặt Homestay.
-                                                        </p>
-                                                        </div>
-                                                    ) : (
-                                                    <div className="contact-form">
-                                                        <div className="row_bth">
-                                                            <div className="col-sm-12 col-xs-12">
-                                                                <div className="input-group">
-                                                                    <input type="text" hidden  value={homestayCT.id_homestay || ''}  />
-                                                                    <input
-                                                                        required
-                                                                        type="text"
-                                                                        name="ten_user" // Đảm bảo tên này khớp với đối tượng user
-                                                                        id="full_name"
-                                                                        data-valid="full_name"
-                                                                        className="form-control"
-                                                                        placeholder="Tên của bạn"
-                                                                        value={user.ten_user || ''}
-                                                                        onChange={handleInputChange}
-                                                                        readOnly
-                                                                        />
-                                                                </div>
-                                                                <p className="full_name-validation field-error"></p>
-                                                            </div>
-                                                            <div className="col-sm-12 col-xs-12">
-                                                                <div className="input-group">
-                                                                <input
-                                                                    pattern="[0-9]{10,12}"
-                                                                    required
-                                                                    type="text"
-                                                                    name="sdt_user" // Tên này cũng khớp với đối tượng user
-                                                                    id="your_phone"
-                                                                    data-valid="your_phone"
-                                                                    className="form-control"
-                                                                    placeholder="Số điện thoại"
-                                                                    value={user.sdt_user || ''}
-                                                                    onChange={handleInputChange}
-                                                                    readOnly
-                                                                    />
-                                                                </div>
-                                                                <p className="your_phone-validation field-error"></p>
-                                                            </div>
-                                                            <div className="col-sm-12 col-xs-12">
-                                                                <div className="input-group">
-                                                                <input
-                                                                    required
-                                                                    type="text"
-                                                                    name="email_user" // Tên này cũng khớp với đối tượng user
-                                                                    id="your_email"
-                                                                    data-valid="your_email"
-                                                                    className="form-control"
-                                                                    placeholder="Email"
-                                                                    value={user.email_user || ''}
-                                                                    onChange={handleInputChange}
-                                                                    readOnly
-                                                                    />
-                                                                </div>
-                                                                <p className="your_email-validation field-error"></p>
-                                                            </div>
-                                                            <div className="col-sm-12 col-xs-12">
-                                                                <div className="pro-datepicker t-datepicker">
-                                                                    <div className="pro-item pro-when pro-checkin">
-                                                                        <div className="pro-form">
-                                                                            <label>Ngày nhận phòng</label>
-                                                                            <div className="t-check-in">
-                                                                                <DatePicker
-                                                                                    selected={checkInDate}
-                                                                                    onChange={handleCheckInDateChange}
-                                                                                    dateFormat="dd/MM/yyyy"
-                                                                                    todayButton="Hôm nay"
-                                                                                    minDate={new Date()} // Không cho phép chọn ngày trước hôm nay
-                                                                                    className="t-input-check-in"
-                                                                                />
-                                                                              
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="pro-item pro-when pro-checkout">
-                                                                        <div className="pro-form">
-                                                                            <label>Ngày trả phòng</label>
-                                                                            <div className="t-check-out">
-                                                                            <DatePicker
-                                                                                selected={checkOutDate}
-                                                                                onChange={(date) => setCheckOutDate(date)}
-                                                                                dateFormat="dd/MM/yyyy"
-                                                                                todayButton="Hôm nay"
-                                                                                minDate={
-                                                                                    checkInDate
-                                                                                        ? new Date(checkInDate.getTime() + 24 * 60 * 60 * 1000) // Ngày trả phòng ít nhất sau ngày nhận phòng 1 ngày
-                                                                                        : new Date()
-                                                                                }
-                                                                                className="t-input-check-out"
-                                                                            />
-                                                                   
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <input type="hidden" name="entry.1366726942" value={checkInDate.toLocaleDateString("en-GB")} />
-                                                                    <input type="hidden" name="entry.1192184549" value={checkOutDate.toLocaleDateString("en-GB")} />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-sm-12 col-xs-12">
-                                                                <input type="hidden" id="link_pro" name="entry.1473149859" value="" />
-                                                                <div className="pro-total">
-                                                                    <label>Tổng cộng: </label>
-                                                                    <div className="pro-num-total" data-price="">   
-                                                                    {totalPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}                                                               
-                                                                    </div>                                                                   
-                                                                </div>      
-                                                            </div>
-                                                            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-                                                            <div className="col-sm-12 col-xs-12 btn_like ">
-                                                                <div className="btn-more text-center">
-                                                                    <a href="#"><button className="ocean-button btn_like_cart" id="oceanButton">Đặt phòng ngay</button></a>
-                                                                </div>                                                                
-                                                                <div className="btn-more text-center btn_ngan">
-                                                                    <Link to={``}>
-                                                                        <button onClick={addToFavorites} className="ocean-button btn_like_cart" id="oceanButton">Yêu thích <i class="fa-solid fa-heart"></i>
-                                                                        </button>
-                                                                    </Link>
-                                                                </div>
-                                                            </div>
+                                                <div>
+                                                    <p style={{ fontSize: '16px', textAlign: 'center' }}>
+                                                    Bạn cần <Link to="/dk_dn" style={{ textDecoration: 'underline', color: 'blue' }}>Đăng nhập</Link> để đặt Homestay.
+                                                    </p>
+                                                </div>
+                                                ) : (
+                                                <div className="contact-form">
+                                                    <div className="row_bth">
+                                                    <div className="col-sm-12 col-xs-12">
+                                                        <div className="input-group">
+                                                        <input type="text" hidden value={homestayCT.id_homestay || ''} />
+                                                        <input
+                                                            required
+                                                            type="text"
+                                                            name="ten_user"
+                                                            id="full_name"
+                                                            data-valid="full_name"
+                                                            className="form-control"
+                                                            placeholder="Tên của bạn"
+                                                            value={user.ten_user || ''}
+                                                            onChange={handleInputChange}
+                                                            readOnly
+                                                        />
                                                         </div>
                                                     </div>
-                                                      )}
-                                                </form> 
-                                                  {/* Lớp phủ và thông báo */}
-                                                  {isNotificationVisible && (
-                                                        <>
-                                                        <div className="overlay_thongbao_user" style={{ display: 'block' }}></div>
-
-                                                        <div className="notification_thongbao_user" style={{ display: 'flex' }}>
-                                                            <p>{notificationMessage}</p>
-                                                            <span>{timeLeft}s</span>
-                                                            <button onClick={handleContinueShopping}>Tiếp tục chọn</button>
-                                                            <button onClick={handleGoToCart}>Xem yêu thích</button>
+                                                    <div className="col-sm-12 col-xs-12">
+                                                        <div className="input-group">
+                                                        <input
+                                                            pattern="[0-9]{10,12}"
+                                                            required
+                                                            type="text"
+                                                            name="sdt_user"
+                                                            id="your_phone"
+                                                            data-valid="your_phone"
+                                                            className="form-control"
+                                                            placeholder="Số điện thoại"
+                                                            value={user.sdt_user || ''}
+                                                            onChange={handleInputChange}
+                                                            readOnly
+                                                        />
                                                         </div>
-                                                        </>
-                                                    )}
+                                                    </div>
+                                                    <div className="col-sm-12 col-xs-12">
+                                                        <div className="input-group">
+                                                        <input
+                                                            required
+                                                            type="text"
+                                                            name="email_user"
+                                                            id="your_email"
+                                                            data-valid="your_email"
+                                                            className="form-control"
+                                                            placeholder="Email"
+                                                            value={user.email_user || ''}
+                                                            onChange={handleInputChange}
+                                                            readOnly
+                                                        />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-sm-12 col-xs-12">
+                                                        <div className="pro-datepicker t-datepicker">
+                                                            {/* Ngày nhận phòng */}
+                                                            <div className="pro-item pro-when pro-checkin">
+                                                            <div className="pro-form">
+                                                                <label>Ngày nhận phòng</label>
+                                                                <div className="t-check-in">
+                                                                <DatePicker
+                                                                    selected={checkInDate}
+                                                                    onChange={(date) => setCheckInDate(date)}
+                                                                    dateFormat="dd/MM/yyyy"
+                                                                    className="t-input-check-in"
+                                                                    minDate={new Date()} // Không cho phép chọn ngày trong quá khứ
+                                                                />
+                                                                </div>
+                                                            </div>
+                                                            </div>
+
+                                                            {/* Ngày trả phòng */}
+                                                            <div className="pro-item pro-when pro-checkout">
+                                                            <div className="pro-form">
+                                                                <label>Ngày trả phòng</label>
+                                                                <div className="t-check-out">
+                                                                <DatePicker
+                                                                    selected={checkOutDate}
+                                                                    onChange={(date) => setCheckOutDate(date)}
+                                                                    dateFormat="dd/MM/yyyy"
+                                                                    className="t-input-check-out"
+                                                                    minDate={checkInDate} // Không cho phép ngày trả phòng nhỏ hơn ngày nhận phòng
+                                                                />
+                                                                </div>
+                                                            </div>
+                                                            {dateError && <p style={{ color: "red" }}>{dateError}</p>}
+                                                            </div>
+
+                                                            {/* Hidden inputs để gửi dữ liệu */}
+                                                            <input
+                                                            type="hidden"
+                                                            name="entry.1366726942"
+                                                            value={formatDateForInput(checkInDate)}
+                                                            />
+                                                            <input
+                                                            type="hidden"
+                                                            name="entry.1192184549"
+                                                            value={formatDateForInput(checkOutDate)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-sm-12 col-xs-12">
+                                                        <input type="hidden" id="link_pro" name="entry.1473149859" value="" />
+                                                        <div className="pro-total">
+                                                        <label>Tổng cộng: </label>
+                                                        <div className="pro-num-total" data-price="">
+                                                            {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-sm-12 col-xs-12 btn_like">
+                                                        <div className="btn-more text-center">
+                                                        <button type="submit" className="ocean-button btn_like_cart" id="oceanButton">Đặt phòng ngay</button>
+                                                        </div>
+                                                        <div className="btn-more text-center btn_ngan">
+                                                        <Link>
+                                                            <button onClick={addToFavorites} className="ocean-button btn_like_cart" id="oceanButton">
+                                                            Yêu thích <i className="fa-solid fa-heart"></i>
+                                                            </button>
+                                                        </Link>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                )}
+                                            </form>
                                             </div>
+                                        )}
                                         </div>
+                                          {/* Lớp phủ và thông báo */}
+                                        {isNotificationVisible && (
+                                            <>
+                                            <div className="overlay_thongbao_user" style={{ display: 'block' }}></div>
+                                            <div className="notification_thongbao_user" style={{ display: 'flex' }}>
+                                                <p>{notificationMessage}</p>
+                                                <span>{timeLeft}s</span>
+                                                <button onClick={handleContinueShopping}>Tiếp tục chọn</button>
+                                                <button onClick={handleGoToCart}>Xem yêu thích</button>
+                                            </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

@@ -8,7 +8,7 @@ function Home_admin() {
     const [ listSP, ganListSP] = useState([])
     const navigate = useNavigate()
     const fetchData = () => {
-        fetch('http://localhost:3000/admin/homestay/')
+        fetch('http://localhost:3000/admin/homestay')
             .then(res => res.json())
             .then(data => ganListSP(data))
             .catch(err => console.error('Lỗi khi tải dữ liệu:', err));
@@ -24,7 +24,7 @@ function Home_admin() {
             .then(data => {
                 alert('Đã xóa thành công');
                 fetchData(); // Tải lại dữ liệu sau khi xóa
-                navigate("/admin_homestay/")
+                navigate("/admin_danhsach")
             })
             .catch(err => console.error('Lỗi khi xóa:', err));
     };
@@ -50,20 +50,33 @@ function Home_admin() {
                     <tr key={sp.id_homestay}>
                         <td class="admin_table_pra_id">{sp.id_homestay}</td>
                         <td class="admin_table_pra_name">{sp.ten_homestay}</td>
-                        <td class="admin_table_pra_image"><img src={sp.url_hinh} alt="Homestay Image" class="admin_table_pra_img" /></td>
+                        <td class="admin_table_pra_image"> <img src={sp.url_hinh || '/path/to/default-image.jpg'} alt={sp.ten_homestay} /></td>
                         <td class="admin_table_pra_price">{sp.gia_homestay} <span>VND</span></td>
-                        <td class="admin_table_pra_status">{sp.TrangThai}</td>
+                        <td
+                            className={`admin_table_pra_status ${
+                                sp.TrangThai === "Hết phòng" ? "red-text " : "green-text "
+                            }`}
+                            >
+                            {sp.TrangThai}
+                        </td>
                         <td class="admin_table_pra_description">{sp.mota}</td>
                         <td class="tooltip_table_admin">
-                            <button class="btn_table_admin btn-danger_table_admin" onClick={() => xoaSP(sp.id_homestay)}>
-                                Xóa
-                                <span class="tooltiptext_table_admin">Xóa Homestay</span>
+                           <div className="bisai">
+                           <button
+                                 class="btn_table_admin btn-primary_table_admin">
+                            <Link to={`/admin_update_homestay/${sp.id_homestay}`}>
+                                Sửa
+                            </Link>
                             </button>
                             &nbsp;
-                            <a href={`/admin_update_homestay/${sp.id_homestay}`} class="btn_table_admin btn-primary_table_admin">
-                                Sửa
-                                <span class="tooltiptext_table_admin">Sửa thông tin Homestay</span>
-                            </a>
+                            
+                            <button class="btn_table_admin btn-danger_table_admin" onClick={() => xoaSP(sp.id_homestay)}>
+                                Xóa
+                            </button>
+                           </div>
+                            
+                            
+                         
                         </td>
                     </tr>
                 ))}

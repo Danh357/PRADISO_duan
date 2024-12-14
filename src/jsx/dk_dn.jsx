@@ -96,65 +96,6 @@ const DK_DN = () => {
         setError('Có lỗi xảy ra, vui lòng thử lại');
       }
   };
-  ///dang nhap
-
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-  
-  //   try {
-  //     // Gửi yêu cầu POST tới server để kiểm tra tài khoản
-  //     const response = await fetch('http://localhost:3000/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ email_user, pass_user }),
-  //     });
-  
-  //     const data = await response.json();
-  
-  //     // Kiểm tra nếu đăng nhập thành công
-  //     if (response.ok) {
-  //       if (data.user) {
-  //         console.log('Đăng nhập thành công:', data);
-  //         login(data.user);      
-  //         localStorage.setItem('auth', JSON.stringify(data.user));
-  //         // Điều hướng dựa trên vai trò của người dùng
-  //         switch (data.user.role) {
-  //           case 0: // ADMIN
-  //             alert('Đăng nhập thành công với quyền ADMIN.');
-  //             navigate('/admin');
-  //             break;
-  //           case 1: // NHÂN VIÊN
-  //             alert('Đăng nhập thành công với quyền NHÂN VIÊN.');
-  //             navigate('/admin');
-  //             break;
-  //           case 2: // USER
-  //             alert('Đăng nhập thành công! Chào mừng ' + data.user.ten_user);
-  //             navigate('/');
-  //             break;
-  //           default:
-  //             alert('Vai trò không hợp lệ.');
-  //         }
-  
-  //         // Reload trang sau khi điều hướng
-  //         window.location.reload();
-  //       } else {
-  //         // Nếu tài khoản không tồn tại
-  //         setError('Tài khoản không tồn tại.');
-  //         setShowRegisterLink('false');
-  //       }
-  //     } else {
-  //       // Nếu có lỗi từ phía server
-  //       setError(data.message || 'Có lỗi không xác định từ server');
-  //       setShowRegisterLink('false');
-  //     }
-  //   } catch (error) {
-  //     // Nếu có lỗi xảy ra khi kết nối tới API
-  //     setError('Có lỗi xảy ra khi đăng nhập: ' + error.message);
-  //     setShowRegisterLink('false');
-  //   }
-  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -217,9 +158,9 @@ const DK_DN = () => {
         <div className={`container_dk_dn ${isRightPanelActive ? 'right-panel-active_dk_dn' : ''}`} id="container_dk_dn">
            
             {/* Form Đăng Nhập */}
-            <div className="form-container_dk_dn sign-in-container_dk_dn">
-                <form className="form_dk_dn" onSubmit={handleSubmit}>
-                    <h1 className="Auth-form-title_dk_dn">Đăng Nhập</h1>
+              <div className="form-container_dk_dn sign-in-container_dk_dn row1">
+                  <form className="form_dk_dn" onSubmit={handleSubmit}>
+                      <h1 className="Auth-form-title_dk_dn">Đăng Nhập</h1>
                     <input
                         type="email"
                         className="form-control_dk_dn"
@@ -238,11 +179,22 @@ const DK_DN = () => {
                             required
                         />
                         <span className="toggle-password" onClick={togglePasswordVisibility}>
-                            {showPassword ? '👁️' : '👁️‍🗨️'}
+                        <i className={showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'}></i>
                         </span>
                     </div>
-                    <button className="btn_dk_dn">Đăng nhập</button>
                     <Link to="/quen_pass" className="forgot-password">Bạn quên mật khẩu?</Link>
+                    <div class="login-container">
+                 
+                      <div class="circle-container">
+                          <a href="https://www.facebook.com" target="_blank" class="circle">
+                              <i class="fab fa-facebook icon facebook"></i>
+                          </a>
+                          <a href="https://accounts.google.com" target="_blank" class="circle">
+                              <i class="fab fa-google icon google"></i>
+                          </a>
+                      </div>
+                    </div>
+                    <button className="btn_dk_dn">Đăng nhập</button>
                     {error && <div className="error-message">{error}</div>}
                 </form>
             </div>
@@ -277,7 +229,7 @@ const DK_DN = () => {
                             required
                         />
                         <span className="toggle-password" onClick={togglePasswordVisibility}>
-                            {showPassword ? '👁️' : '👁️‍🗨️'}
+                        <i className={showPassword ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'}></i>
                         </span>
                     </div>
                     <input
@@ -302,7 +254,7 @@ const DK_DN = () => {
                         <button className="ghost_dk_dn" onClick={handleSignInClick}>Đăng Nhập</button>
                     </div>
                     <div className="overlay-panel_dk_dn overlay-right_dk_dn">
-                        <h1>Xin chào!</h1>
+                        <h1>Chào Bạn !</h1>
                         <p>Nhập thông tin cá nhân của bạn và bắt đầu hành trình với chúng tôi</p>
                         <button className="ghost_dk_dn" onClick={handleSignUpClick}>Đăng Ký</button>
                     </div>

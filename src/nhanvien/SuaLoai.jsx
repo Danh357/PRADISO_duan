@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const SuaLoai = () => {
     const { id } = useParams(); // Lấy id của loại homestay từ URL
     const [loading, setLoading] = useState(true);
     const [sp, setSp] = useState({
+        id_Loai:'',
         Ten_Loai:'',
         Mo_ta : '',
     });
@@ -76,6 +77,18 @@ const SuaLoai = () => {
         <h2>Cập nhật loại Homestay</h2>
         <form>
             <div className="form-group_admin_pra">
+                <label htmlFor="idLoai">Id Loại Homestay</label>
+                <input 
+                    type="number" 
+                    id="idLoai" 
+                    name="id_Loai" 
+                    className="form-control"
+                    value={sp.id_Loai || ''} 
+                    onChange={handleChange} 
+                    required
+                />
+            </div>
+            <div className="form-group_admin_pra">
                 <label htmlFor="tenLoai">Tên Loại Homestay</label>
                 <input 
                     type="text" 
@@ -105,13 +118,12 @@ const SuaLoai = () => {
                     type="button" 
                     onClick={submitDuLieu}
                 >
-                    Cập nhật 
+                    Cập nhật loại Homestay
                 </button>
                 &nbsp;
-                <button className="btn btn-warning" type="button" ><Link to="/admin_loaihomestay" className="btn btn-info">
+                <a href="/admin_loaihomestay" className="btn btn-info">
                     Danh sách loại
-                </Link>
-                </button>
+                </a>
             </div>
         </form>
     </div>

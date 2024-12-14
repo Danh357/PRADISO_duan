@@ -1,38 +1,77 @@
-<div className="profile-container_infor_nguoidung">
-    <div className="profile-card_infor_nguoidung">
-      <div className="profile-avatar_infor_nguoidung">
-        <img src="../../image/user2.png" alt="Avatar" />
-        {/* Icon đổi avatar với input file */}
-        <div className="change-avatar-icon">
-          <label htmlFor="avatar-upload">
-            <i className="fa-regular fa-image"></i>
-          </label>
-          <input
-            type="file"
-            id="avatar-upload"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleAvatarChange}
-          />
-        </div>
-      </div>
-      <div className="profile-info_infor_nguoidung">
-        <h2>
-          {user.id_user}. {user.ten_user}
-        </h2>
-        <p>
-          <span className="icon_infor_nguoidung">
-            <i className="fa-solid fa-phone"></i>
-          </span>{" "}
-          {user.sdt_user}
-        </p>
-        <p>
-          <span className="icon_infor_nguoidung">
-            <i className="fa-solid fa-envelope"></i>
-          </span>{" "}
-          {user.email_user}
-        </p>
-      </div>
-    </div>
+<style>
+  /* Pagination container */
+  .pagination_phong {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+  
+  /* Links for pagination */
+  .pagination_phong a, .pagination_phong span {
+    display: inline-block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Active page */
+  .pagination_phong a.active_phong {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  /* Dots */
+  .pagination_phong span.dots_phong {
+    color: #888;
+    border: none;
+    cursor: default;
+  }
+  
+  /* Hover effect */
+  .pagination_phong a:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+  }
+  
+  /* Disabled links (e.g., at the start or end) */
+  .pagination_phong a.disabled_phong {
+    color: #aaa;
+    pointer-events: none;
+    border-color: #ddd;
+  }
+  
+  /* Previous and Next links */
+  .pagination_phong a.prev_phong, .pagination_phong a.next_phong {
+    font-weight: bold;
+  }
+  
+  /* Small screen adjustments */
+  @media screen and (max-width: 480px) {
+    .pagination_phong {
+      font-size: 12px;
+      gap: 5px;
+    }
+    .pagination_phong a, .pagination_phong span {
+      padding: 6px 8px;
+    }
+  }
+  </style>
+  
+  <div class="pagination_phong">
+    <a href="#" class="prev_phong">&laquo; Trước</a>
+    <a href="#" class="page_phong active_phong">1</a> <!-- Trang 1 là trang active -->
+    <a href="#" class="page_phong">2</a>
+    <a href="#" class="page_phong">3</a>
+    <span class="dots_phong">...</span>
+    <a href="#" class="page_phong">10</a>
+    <a href="#" class="next_phong">Tiếp &raquo;</a>
   </div>
   

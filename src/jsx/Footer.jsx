@@ -16,8 +16,8 @@ function Footer() {
                 <div className="min_warp2">
                     <div className="row" data-aos="fade-up" data-aos-duration="3000">
                         <div className="col1_ft">
-                            <h2><a href="">Paradiso</a></h2>
-                            <p>Được thành lập vào năm 1998, Maple Inn tọa lạc trên những ngọn đồi của Lâm Đồng, đưa bạn đắm chìm vào sự kỳ diệu của dãy núi Langbiang của Đà Lạt trên nền trời trong xanh. Chào mừng đến với Maple Inn</p>
+                        <h4 className="col1_tittle_ft"><Link to={`#`}>Paradiso</Link></h4>
+                            <p>Được thành lập vào năm 1998, Maple Inn tọa lạc trên những ngọn đồi của Lâm Đồng, đưa bạn đắm chìm vào sự kỳ diệu của dãy núi Langbiang của Đà Lạt trên nền trời trong xanh. Chào mừng đến với Paradiso</p>
                             <ul className="footer_icon">
                                 <li className="item_ft"><a href="#"><i className="fa-brands fa-facebook-f"></i></a></li>		
                                 <li className="item_ft"><a href="#"><i className="fa-brands fa-x-twitter"></i></a></li>											

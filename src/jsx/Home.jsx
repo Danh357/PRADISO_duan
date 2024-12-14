@@ -8,14 +8,25 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 
 function Home() {
     const { id } = useParams();
+    const [checkIn, setCheckIn] = useState(new Date());  
+    const [checkOut, setCheckOut] = useState(new Date(new Date().setDate(new Date().getDate() + 1))); 
+    const [roomType, setRoomType] = useState('');
+    const [homestayData, setHomestayData] = useState([]);
+    const [datHomestay, setDatHomestay] = useState([]);
+    const [filteredRooms, setFilteredRooms] = useState([]);
+    const [roomTypes, setRoomTypes] = useState([]);
+    const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+    const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
+    const datePickerRef = useRef();
+    const swiperRef = useRef(null); // Ref để truy cập Swiper instance
+
+
     const [showhomestay, setHomestay] = useState(null); // Lưu thông tin homestay
     const [error, setError] = useState(null); // Lưu lỗi nếu có
     const [homestays, setHomestays] = useState([]); // Lưu danh sách homestay
     const [danhSachPhong, setDanhSachPhong] = useState([]); // Lưu danh sách phòng
     const [checkInDate, setCheckInDate] = useState(new Date()); // Ngày nhận phòng mặc định là hôm nay
     const [checkOutDate, setCheckOutDate] = useState(new Date()); // Ngày trả phòng
-    const [isCheckInOpen, setIsCheckInOpen] = useState(false); // Trạng thái mở cho ngày nhận phòng
-    const [isCheckOutOpen, setIsCheckOutOpen] = useState(false); // Trạng thái mở cho ngày trả phòng
     const [roomsAvailable, setRoomsAvailable] = useState([]); // Danh sách phòng trống
     const [showRooms, setShowRooms] = useState(false); // Trạng thái hiển thị danh sách phòng
     const listRef = useRef(null); // Ref cho danh sách phòng
@@ -25,7 +36,20 @@ function Home() {
     const [loaiPhongHienThi, setLoaiPhongHienThi] = useState(''); // Loại phòng hiện tại
     const [selectedLoaiId, setSelectedLoaiId] = useState(null); // ID loại phòng đã chọn
     const [images, setImages] = useState([]); // Hình ảnh homestay
-  
+    const storedUser = JSON.parse(localStorage.getItem('auth'));
+    const [isNotificationVisible, setNotificationVisible] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(5);
+    const [dateError, setDateError] = useState("");
+    const [notificationMessage, setNotificationMessage] = useState(""); // Thông báo
+
+    useEffect(() => {
+        // Cập nhật checkOut nếu checkIn thay đổi
+        if (checkIn) {
+          const newCheckOut = new Date(checkIn);
+          newCheckOut.setDate(newCheckOut.getDate() + 1); // Ngày trả phòng là ngày hôm sau
+          setCheckOut(newCheckOut);
+        }
+      }, [checkIn]); // Chạy khi checkIn thay đổi
 
     // Hàm fetch hình ảnh homestay
     const fetchHomestayImages = async () => {
@@ -54,74 +78,100 @@ function Home() {
           setError("Lỗi khi tải dữ liệu homestay");
         });
     }, [id]);
+
     useEffect(() => {
         axios.get(`http://localhost:3000/homestay`)
           .then(response => {
-            setHomestay(response.data); // Lưu thông tin homestay vào state
+            setHomestay(response.data); // Lưu thông tin homestay vào statepage danh
           })
           .catch(err => {
             setError("Lỗi khi tải dữ liệu homestay");
           });
       }, [id]);
   
-    // Fetch danh sách phòng
     useEffect(() => {
-      fetch('http://localhost:3000/homestay') // API lấy danh sách phòng
-        .then(response => response.json())
-        .then(data => setDanhSachPhong(data))
-        .catch(error => console.error('Error fetching rooms:', error));
-    }, []);
-  
-    // Fetch danh sách loại phòng
-    useEffect(() => {
-      fetch('http://localhost:3000/loaihomestay') // API lấy danh sách loại homestay
-        .then(response => response.json())
-        .then(data => setDanhSachLoaiPhong(data))
-        .catch(error => console.error('Error fetching room types:', error));
-    }, []);
-  
-    // Hàm thay đổi loại phòng khi người dùng chọn từ dropdown
-     const handleChangeLoaiPhong = (event) => {
-      const value = event.target.value;
-      setSelectedLoaiId(value === 'all' ? null : value); // Nếu chọn 'all', gán selectedLoaiId là null
-      setLoaiPhongHienThi(value); // Cập nhật loại phòng hiện thi
+    // Fetch data from APIs
+    const fetchData = async () => {
+        try {
+        const homestayResponse = await axios.get("http://localhost:3000/homestay");
+        const datHomestayResponse = await axios.get("http://localhost:3000/dat_homestay");
+        const loaiHomestayResponse = await axios.get("http://localhost:3000/loaihomestay");
+    
+        // Create a mapping of id_Loai to ten_Loai
+        const loaiHomestayMap = loaiHomestayResponse.data.reduce((map, loai) => {
+            map[loai.id_Loai] = loai.Ten_Loai;
+            return map;
+        }, {});
+    
+        // Attach ten_Loai and bookings to homestayData
+        const updatedHomestayData = homestayResponse.data.map((room) => ({
+            ...room,
+            Ten_Loai: loaiHomestayMap[room.id_Loai] || `Loại ${room.id_Loai}`,
+            bookings: datHomestayResponse.data.filter(
+            (booking) => booking.id_homestay === room.id_homestay
+            ),
+        }));
+    
+        // Extract unique room types from loaiHomestayResponse
+        const uniqueRoomTypes = loaiHomestayResponse.data.map((loai) => ({
+            id_Loai: loai.id_Loai,
+            Ten_Loai: loai.Ten_Loai,
+        }));
+    
+        setHomestayData(updatedHomestayData);
+        setDatHomestay(datHomestayResponse.data);
+        setFilteredRooms(updatedHomestayData); // Default to show all rooms
+        setRoomTypes(uniqueRoomTypes); // Set room types
+        } catch (error) {
+        console.error("Error fetching data: ", error);
+        }
     };
-  
-  
-    // Tính toán chỉ số của homestay bắt đầu và kết thúc trên trang hiện tại
-    const indexOfLastHomestay = currentPage * homestaysPerPage;
-    const indexOfFirstHomestay = indexOfLastHomestay - homestaysPerPage;
-    const currentHomestays = homestays.slice(indexOfFirstHomestay, indexOfLastHomestay); // Homestays hiện tại
-  
-    // Chuyển trang
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  
-    // Hàm lấy phòng còn trống
-    const handleCheckAvailableRooms = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/dshinhanh');
-        const availableRooms = response.data.filter((room) => {
-          const isAvailable = room.TrangThai === 'Còn phòng';
-          const isMatchingLoai = selectedLoaiId ? room.id_Loai === Number(selectedLoaiId) : true; // Nếu selectedLoaiId không có, cho phép tất cả loại
-          return isAvailable && isMatchingLoai;
-        });
-  
-        // Lưu trữ các id_homestay đã hiển thị
-        const displayedIds = new Set();
-        const uniqueAvailableRooms = availableRooms.filter((room) => {
-          if (!displayedIds.has(room.id_homestay)) {
-            displayedIds.add(room.id_homestay);
-            return true; // Giữ lại phòng này
-          }
-          return false; // Bỏ qua phòng đã hiển thị
-        });
-  
-        console.log('Unique Available Rooms:', uniqueAvailableRooms); // Kiểm tra danh sách phòng có còn trống không 
-        setRoomsAvailable(uniqueAvailableRooms); // Lưu lại các phòng còn trống vào state
-        setShowRooms(true); // Hiển thị danh sách phòng
-      } catch (error) {
-        console.error('Lỗi khi lấy danh sách phòng:', error);
-      }
+    
+    fetchData();
+    }, []);
+      
+    const isOverlap = (start1, end1, start2, end2) => {
+    return !(end1 < start2 || end2 < start1);
+    };
+    
+    const filterRooms = () => {
+    const target = document.getElementById('rooms_section');
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+    }
+    const checkInDate = checkIn ? new Date(checkIn) : null;
+    const checkOutDate = checkOut ? new Date(checkOut) : null;
+    
+    if (!checkIn || !checkOut) {
+    setFilteredRooms(
+        homestayData.filter(
+        (room) => !roomType || room.id_Loai === parseInt(roomType)
+        )
+    );
+    return;
+    }
+    
+    if (checkInDate >= checkOutDate) {
+    alert("Ngày nhận phòng phải trước ngày trả phòng.");
+    return;
+    }
+    
+    const availableRooms = homestayData.filter((room) => {
+    if (roomType && room.id_Loai !== parseInt(roomType)) {
+        return false;
+    }
+    
+    return !datHomestay.some((booking) => {
+        if (booking.id_homestay === room.id_homestay) {
+        const bookingCheckIn = new Date(booking.ngay_dat);
+        const bookingCheckOut = new Date(booking.ngay_tra);
+        return isOverlap(checkInDate, checkOutDate, bookingCheckIn, bookingCheckOut);
+        }
+        return false;
+    });
+    });
+    
+    setFilteredRooms(availableRooms);
     };
   
     // Hàm để ẩn danh sách phòng khi click ra ngoài
@@ -134,35 +184,165 @@ function Home() {
     // Lắng nghe sự kiện click trên toàn bộ tài liệu
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);
-      
       // Cleanup để gỡ bỏ sự kiện khi component bị unmount
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }, []);
-    // Fetch homestays khi component được render
     // sự kiện click cho show sản phẩm
-        const swiperRef = useRef(null); // Ref để truy cập Swiper instance
+
+    useEffect(() => {
+    // Hàm đóng DatePicker khi click ngoài
+    const handleClickOutside = (event) => {
+        if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+        setIsCheckInOpen(false); // Đóng DatePicker khi click ngoài
+        }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+    }, []);
+
+    const handleDatePickerClick = (e) => {
+    e.stopPropagation(); // Ngừng sự kiện lan truyền ra ngoài
+    };
+
+    const [existingFavorites, setExistingFavorites] = useState(() => {
+        return JSON.parse(localStorage.getItem("favorites")) || [];
+    });
+    
+    const toggleFavorite = (homestay) => {
+        if (!storedUser) {
+            const goToLogin = window.confirm("Bạn cần đăng nhập để quản lý danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
+            if (goToLogin) {
+                window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+            }
+            return;
+        }
+    
+        if (!homestay) {
+            console.error("Không có thông tin homestay");
+            return;
+        }
+    
+        setExistingFavorites((prevFavorites) => {
+            let updatedFavorites;
+    
+            if (prevFavorites.some(item => item.id_homestay === homestay.id_homestay)) {
+                // Nếu đã có trong danh sách yêu thích, xóa khỏi danh sách
+                updatedFavorites = prevFavorites.filter(item => item.id_homestay !== homestay.id_homestay);
+                setNotificationMessage("Sản phẩm đã được xóa khỏi danh sách yêu thích!"); // Thông báo xóa thành công
+            } else {
+                // Nếu chưa có trong danh sách yêu thích, thêm vào
+                updatedFavorites = [...prevFavorites, homestay];
+                setNotificationMessage("Sản phẩm đã được thêm vào danh sách yêu thích!"); // Thông báo thêm thành công
+            }
+    
+            // Cập nhật localStorage sau khi thay đổi state
+            localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    
+            setNotificationVisible(true); // Hiển thị thông báo
+            return updatedFavorites; // Trả về updatedFavorites
+        });
+    };
+    const addToFavorites = (homestay) => {
+        if (!storedUser) {
+            const goToLogin = window.confirm("Bạn cần đăng nhập để thêm sản phẩm vào danh sách yêu thích. Bạn có muốn đến trang đăng nhập?");
+            if (goToLogin) {
+                window.location.href = '/dk_dn'; // Điều hướng đến trang đăng nhập
+            }
+            return;
+        }
+    
+        if (!homestay) {
+            console.error("Không có thông tin homestay");
+            return;
+        }
+    
+        setExistingFavorites((prevFavorites) => {
+            const isFavorite = prevFavorites.some(item => item.id_homestay === homestay.id_homestay);
+            
+            if (!isFavorite) {
+                const updatedFavorites = [...prevFavorites, homestay];
+                localStorage.setItem("favorites", JSON.stringify(updatedFavorites)); // Lưu vào localStorage
+                setNotificationMessage("Sản phẩm đã được thêm vào danh sách yêu thích!");
+            } else {
+                setNotificationMessage("Sản phẩm này đã có trong danh sách yêu thích.");
+            }
+    
+            setNotificationVisible(true); // Hiển thị thông báo
+            return prevFavorites; // Trả về prevFavorites vì không thay đổi khi đã có trong danh sách
+        });
+    };
+    
+    useEffect(() => {
+        let countdownInterval;
+    
+        if (isNotificationVisible) {
+        // Đặt lại thời gian mỗi khi thông báo xuất hiện
+        setTimeLeft(10); // Đặt lại bộ đếm về 5 giây
+    
+        countdownInterval = setInterval(() => {
+            setTimeLeft(prevTime => {
+            if (prevTime === 1) {
+                setNotificationVisible(false); // Ẩn thông báo khi hết thời gian
+                return 0;
+            }
+            return prevTime - 1;
+            });
+        }, 1000);
+        }
+    
+        return () => clearInterval(countdownInterval); // Dọn dẹp khi component unmount hoặc trạng thái thay đổi
+    }, [isNotificationVisible]);
+  
+    const handleContinueShopping = () => {
+        setNotificationVisible(false); // Tắt thông báo
+    };
+    const handleGoToCart = () => {
+        window.location.href = '/thich'; // Điều hướng đến trang đăng nhập
+    };
+
+    const renderStars = (rating) => {
+        // Mảng chứa các thẻ <i> ngôi sao
+        const stars = [];
         
-        const datePickerRef = useRef(null);
+        // Tính số sao đầy
+        const fullStars = Math.floor(rating);
+        
+        // Kiểm tra nếu có sao rưỡi
+        const hasHalfStar = rating % 1 >= 0.5;
+      
+        // Thêm sao đầy (hiển thị trước)
+        for (let i = 0; i < fullStars; i++) {
+          stars.push(<i key={`full-${i}`} className="fa-solid fa-star"></i>);
+        }
+      
+        // Thêm sao rưỡi (hiển thị sau cùng, nếu có)
+        if (hasHalfStar) {
+          stars.push(<i key="half" className="fa-solid fa-star-half"></i>);
+        }
+      
+        // Trả về các ngôi sao đã tạo ra
+        return stars;
+    };
 
-useEffect(() => {
-  // Hàm đóng DatePicker khi click ngoài
-  const handleClickOutside = (event) => {
-    if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
-      setIsCheckInOpen(false); // Đóng DatePicker khi click ngoài
-    }
-  };
+    useEffect(() => {
+        // Cập nhật checkOut nếu checkIn thay đổi
+        if (checkIn) {
+          const newCheckOut = new Date(checkIn);
+          newCheckOut.setDate(newCheckOut.getDate() + 1); // Ngày trả phòng là ngày hôm sau
+          setCheckOut(newCheckOut);
+        }
+    }, [checkIn]); // Chạy khi checkIn thay đổi
+    
+      
+      
+      
+      
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
-const handleDatePickerClick = (e) => {
-  e.stopPropagation(); // Ngừng sự kiện lan truyền ra ngoài
-};
     if (error) return <p>{error}</p>;
     if (!showhomestay) return <p>Loading...</p>;
 return(
@@ -182,172 +362,188 @@ return(
             <div className="min_warp3">
               <div className="wap_form_booking">
                 <div className="form_booking">
-                    <div className="checkin_homstay t-datepicker" >
-                        <div className="date_check_in search_item"  onClick={() => setIsCheckInOpen(!isCheckInOpen)}>
-                            <div className="seach_icons">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
-                                    <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M3.75 8.25H20.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                </svg>
+                      {/* form */}
+                    <div className="checkin_homstay t-datepicker">
+                    <div
+                      className="date_check_in search_item"
+                      onClick={(e) => {
+                        setIsCheckInOpen(!isCheckInOpen);
+                        e.stopPropagation();
+                      }}
+                    >
+                      <div className="seach_icons">
+                        {/* Icon tìm kiếm */}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
+                          <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M3.75 8.25H20.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                        </svg>
+                      </div>
+                      <div className="search-form">
+                        <label>Ngày nhận phòng</label>
+                        <div className="t-check-in">
+                          <div className="t-dates t-date-check-in">
+                            <span className="t-day-check-in">
+                              {checkIn ? new Date(checkIn).getDate().toString().padStart(2, '0') : '01'}/
+                            </span>
+                            <span className="t-month-check-in">
+                              {checkIn ? (new Date(checkIn).getMonth() + 1).toString().padStart(2, '0') : '01'}/
+                            </span>
+                            <span className="t-year-check-in">
+                              {checkIn ? new Date(checkIn).getFullYear() : '2024'}
+                            </span>
+                          </div>
+                          {isCheckInOpen && (
+                            <div className="date-picker-container1" ref={datePickerRef}>
+                              <DatePicker
+                                selected={checkIn ? new Date(checkIn) : null}
+                                onChange={(date) => setCheckIn(date)}
+                                dateFormat="dd/MM/yyyy"
+                                className="t-input-check-in"
+                                todayButton="Hôm nay"
+                                onClickOutside={() => setIsCheckInOpen(false)} // Đóng khi click ra ngoài
+                                inline
+                                minDate={new Date()} // Vô hiệu hóa các ngày đã qua
+                                showMonthDropdown
+                                showYearDropdown
+                                dropdownMode="select"
+                              />
                             </div>
-                            <div className="search-form">
-                                <label>Ngày nhận phòng</label>
-                                <div className="t-check-in">
-                                    <div className="t-dates t-date-check-in">
-                                        <label className="t-date-info-title"></label>
-                                        <span className="t-day-check-in">{checkInDate.getDate().toString().padStart(2, '0')}//</span>
-                                        <span className="t-month-check-in">{(checkInDate.getMonth() + 1).toString().padStart(2, '0')}/</span>
-                                        <span className="t-year-check-in">{checkInDate.getFullYear()}</span>
-                                    </div>
-                                    {isCheckInOpen && (
-                                    <div className="date-picker-container1"  ref={datePickerRef}  onClick={handleDatePickerClick}>
-                                    <DatePicker
-                                    selected={checkInDate} // Ngày hiện tại
-                                    onChange={(date) => {
-                                        console.log('Ngày đã chọn:', date); // Thêm dòng này để debug
-                                        setCheckInDate(date);
-                                        setIsCheckInOpen(false);
-                                    }}
-                                    dateFormat="dd/MM/yyyy"
-                                    className="t-input-check-in"
-                                    todayButton="Hôm nay"
-                                    onClickOutside={() => setIsCheckInOpen(false)} // Đóng khi click ra ngoài
-                                    inline // Hiển thị lịch luôn
-                                    minDate={new Date()} // Vô hiệu hóa các ngày đã qua
-                                    showMonthDropdown // Hiển thị dropdown tháng
-                                    showYearDropdown // Hiển thị dropdown năm
-                                    dropdownMode="select" // Dropdown dạng select
-                                    />
-                                    </div>
-                                    )}
-                                </div>
-                            </div>
+                          )}
                         </div>
-                        <div className="date_check_out search_item"  onClick={() => setIsCheckOutOpen(!isCheckOutOpen)}>
-                            <div className="seach_icons">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
-                                    <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
-                                    <path d="M3.75 8.25H20.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
-                                </svg>
-                            </div>
-                            <div className="search-form">
-                                <label>Ngày trả phòng</label>
-                                <div className="t-check-in">
-                                    <div className="t-dates t-date-check-out">
-                                        <span className="t-day-check-out">
-                                        {checkOutDate.getDate().toString().padStart(2, '0')}/
-                                        </span>
-                                        <span className="t-month-check-out">
-                                        {(checkOutDate.getMonth() + 1).toString().padStart(2, '0')}/
-                                        </span>
-                                        <span className="t-year-check-out">{checkOutDate.getFullYear()}</span>
-                                    </div>
-                                    {isCheckOutOpen && (
-                                    <div className="date-picker-container2"  ref={datePickerRef}  onClick={handleDatePickerClick}>
-                                        <DatePicker
-                                    selected={checkOutDate}
-                                    onChange={(date) => {
-                                    console.log('Ngày trả phòng đã chọn:', date);
-                                    setCheckOutDate(date);
-                                    setIsCheckOutOpen(false);
-                                    }}
-                                    dateFormat="dd/MM/yyyy"
-                                    className="t-input-check-out"
-                                    todayButton="Hôm nay"
-                                    onClickOutside={() => setIsCheckOutOpen(false)}
-                                    inline
-                                    showMonthDropdown // Hiển thị dropdown tháng
-                                    showYearDropdown // Hiển thị dropdown năm
-                                    dropdownMode="select" // Dropdown dạng select
-                                    minDate={checkInDate} // Vô hiệu hóa các ngày trước ngày nhận phòng
-                                />
-                                </div>
-                                )}
-                                </div>
-                            </div>
-
-                        </div>
+                      </div>
                     </div>
+
+                    {/* Phần chọn ngày trả phòng */}
+                    <div
+                      className="date_check_out search_item"
+                      onClick={() => setIsCheckOutOpen(!isCheckOutOpen)}
+                    >
+                      <div className="seach_icons">
+                        {/* Icon tìm kiếm */}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24px" viewBox="0 0 24 24" fill="none">
+                          <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M16.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M7.5 2.25V5.25" stroke="#AAAFB6" strokeWidth="2" strokeLinecap="round"strokeLinejoin="round"></path>
+                          <path d="M3.75 8.25H20.25" stroke="#AAAFB6" strokeWidth="1.5" strokeLinecap="round"strokeLinejoin="round"></path>
+                        </svg>
+                      </div>
+                      <div className="search-form">
+                        <label>Ngày trả phòng</label>
+                        <div className="t-check-in">
+                          <div className="t-dates t-date-check-out">
+                            <span className="t-day-check-out">
+                              {checkOut ? new Date(checkOut).getDate().toString().padStart(2, '0') : '01'}/
+                            </span>
+                            <span className="t-month-check-out">
+                              {checkOut ? (new Date(checkOut).getMonth() + 1).toString().padStart(2, '0') : '01'}/
+                            </span>
+                            <span className="t-year-check-out">
+                              {checkOut ? new Date(checkOut).getFullYear() : '2024'}
+                            </span>
+                          </div>
+                          {isCheckOutOpen && (
+                            <div className="date-picker-container2" ref={datePickerRef}>
+                            <DatePicker
+                              selected={checkOut}  // Đảm bảo checkOut được cập nhật đúng
+                              onChange={(date) => setCheckOut(date)} // Cập nhật giá trị checkOut khi người dùng thay đổi ngày trả phòng
+                              dateFormat="dd/MM/yyyy"
+                              className="t-input-check-out"
+                              todayButton="Hôm nay"
+                              onClickOutside={() => setIsCheckOutOpen(false)} 
+                              inline
+                              minDate={checkIn ? new Date(new Date(checkIn).getTime() + 24 * 60 * 60 * 1000) : new Date()} // Đảm bảo checkOut >= checkIn + 1 ngày
+                              showMonthDropdown
+                              showYearDropdown
+                              dropdownMode="select"
+                            />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+
+                       {/* Phần chọn loại homestay */}
                     <div className="number_people search_item">
                         <div className="seach_icons">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M288 350.1l0 1.9-32 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L447.3 128.1c-12.3-1-25 3-34.8 11.7c-35.4 31.6-65.6 67.7-87.3 102.8C304.3 276.5 288 314.9 288 350.1zM480 512c-88.4 0-160-71.6-160-160c0-76.7 62.5-144.7 107.2-179.4c5-3.9 10.9-5.8 16.8-5.8c7.9-.1 16 3.1 22 9.2l46 46 11.3-11.3c11.7-11.7 30.6-12.7 42.3-1C624.5 268 640 320.2 640 352c0 88.4-71.6 160-160 160zm64-111.8c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C453 327.1 416 363.6 416 400.2c0 35.3 28.7 64 64 64s64-28.7 64-64z"/></svg>
+                        {/* Icon số người */}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M288 350.1l0 1.9-32 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L447.3 128.1c-12.3-1-25 3-34.8 11.7c-35.4 31.6-65.6 67.7-87.3 102.8C304.3 276.5 288 314.9 288 350.1zM480 512c-88.4 0-160-71.6-160-160c0-76.7 62.5-144.7 107.2-179.4c5-3.9 10.9-5.8 16.8-5.8c7.9-.1 16 3.1 22 9.2l46 46 11.3-11.3c11.7-11.7 30.6-12.7 42.3-1C624.5 268 640 320.2 640 352c0 88.4-71.6 160-160 160zm64-111.8c0-36.5-37-73-54.8-88.4c-5.4-4.7-13.1-4.7-18.5 0C453 327.1 416 363.6 416 400.2c0 35.3 28.7 64 64 64s64-28.7 64-64z"/></svg>
                         </div>
-                            <div className="search-form">
-                                <div className="group-dropdown-qty">
-                                    <label className="homestay_type" htmlFor="homestay-type">Loại homestay</label>
-                                    <select id="homestay-type" value={loaiPhongHienThi} onChange={handleChangeLoaiPhong}>
-                                        <option value="all">Tất cả các loại phòng</option>
-                                        {Array.isArray(danhSachLoaiPhong) && danhSachLoaiPhong.map(loai => {
-                                            // console.log(loai.id_Loai);
-                                            return (
-                                            <option key={loai.id_Loai} value={loai.id_Loai}>
-                                                {loai.Ten_Loai}
-                                            </option>
-                                        )})}
-                                    </select>
-                                    </div>
-                            </div>
+                    <div className="search-form">
+                      <div className="group-dropdown-qty">
+                        <label className="homestay_type" htmlFor="homestay-type">Loại homestay</label>
+                        <select
+                          id="homestay-type"
+                          value={roomType}
+                          onChange={(e) => setRoomType(e.target.value)}
+                        >
+                          <option value="">Tất cả các loại</option>
+                          {roomTypes.map((type) => (
+                            <option key={type.id_Loai} value={type.id_Loai}>
+                              {type.Ten_Loai}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
+                   </div>
+                      {/* Nút Đặt phòng */}
                     <div className="btn-more text-center search_btn">
-                        <button type="button" className="ocean-button book_room" onClick={handleCheckAvailableRooms}>
-                            Đặt phòng
+                        <button type="button" className="ocean-button book_room"  onClick={() => {
+                            filterRooms(); // Gọi hàm lọc phòng
+                            setShowRooms(true); // Cập nhật trạng thái hiển thị danh sách phòng
+                            }} >
+                        Đặt phòng
                         </button>
                         {showRooms && (
-                        <div ref={listRef} className="available-rooms">
-                        <h3>Các phòng còn trống tại <strong>PARADISO</strong></h3>
-                        {roomsAvailable.length === 0 ? (
-                            <p>Không có phòng còn trống.</p>
-                        ) : (
-                            <ul className="show_sp">
-                            {roomsAvailable.map((room) => {
-                                // console.log(room.id_homestay)
-                                return(
-                                <li key={room.id_homestay}>
-                                <Link to={"/homestay/" + room.id_homestay}>
-                                    <div className="show_img">
-                                    {images.length > 0 ? (
-                                        images.map((image, index) => {
-                                        if (room.id_homestay === image.id_hinh) {
-                                            return (
-                                            <div key={image.id_homestay || index} className="add_img"> {/* Sử dụng image.id hoặc index */}
-                                                <div className="homestay-sale">Giảm giá 20%</div>
-                                                <img
-                                                className="img-loop"
-                                                src={image.url_hinh}
-                                                alt={room.ten_homestay || 'Hình ảnh homestay'}
-                                                />
+                            <div ref={listRef} className="available-rooms">
+                            <h4 className="danhgia-header left-text">Các phòng trống </h4>
+                                {filteredRooms.length > 0 ? (
+                                <ul className="show_sp">
+                                    {filteredRooms.map((room) => (
+                                    <li key={room.id_homestay}>
+                                          <Link to={`/homestay/${room.id_homestay}?checkIn=${checkIn.toISOString()}&checkOut=${checkOut.toISOString()}`}>{room.ten_homestay}
+                                            <div className="show_img">
+                                                {images.length > 0 ? (
+                                                images
+                                                    .filter((image) => room.id_homestay === image.id_hinh)
+                                                    .map((image, index) => (
+                                                    <div key={index} className="add_img">
+                                                        <div className="homestay-sale">{room.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+                                                        <img
+                                                        className="img-loop"
+                                                        src={image.url_hinh}
+                                                        alt={room.ten_homestay || 'Hình ảnh homestay'}
+                                                        />
+                                                    </div>
+                                                    ))
+                                                ) : (
+                                                <p>Không có hình để hiển thị</p>
+                                                )}
                                             </div>
-                                            );
-                                        }
-                                        return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
-                                        })
-                                    ) : (
-                                        <p>Không có hình để hiển thị</p>
-                                    )}
-                                    </div>
-                                    <div className="homestay-info">
-                                    <h3 className="homestay-name">{room.ten_homestay}</h3>
-                                    <p className="homestay-price">Giá: {room.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} /đêm</p>
-                                    <p className="homestay-rating">{'⭐'.repeat(Math.floor(room.danh_gia))} (4.5/5)</p>
-                                    <div className="room-status">
-                                        {room.TrangThai === 'Còn phòng' ? (
-                                        <span style={{ color: 'green' }}>Còn phòng</span>
-                                        ) : (
-                                        <span style={{ color: 'red' }}>Đã đặt</span>
-                                        )}
-                                    </div>
-                                    </div>
-                                </Link>
-                                </li>
-                            )})}
-                            </ul>
-                        )}
-                        </div>
-                    )}
+                                        <div className="homestay-info">
+                                            <h3 className="homestay-name">{room.ten_homestay}</h3>
+                                            <p className="homestay-price">
+                                            </p>
+                                            <p className="homestay-rating">
+                                                {renderStars(room.danh_gia)}
+                                            <span className="homestay-price">({room.danh_gia.toFixed(2)}/5)</span>
+                                            </p>
+                                            
+                                        </div>
+                                        </Link>
+                                    </li>
+                                    ))}
+                                </ul>
+                                ) : (
+                                <p>Không có phòng nào trống.</p>
+                                )}
+                            </div>
+                            )}
+                          
+                            
                     </div>
                 </div>
               </div>
@@ -373,7 +569,7 @@ return(
                                         </picture>
                                         <div className="about-content text-center">
                                             <div className="heading-title">
-                                                <p className="title1">Chào mừng bạn đến với Maple Inn</p>
+                                                <p className="title1">Chào mừng bạn đến với Paradiso</p>
                                                 <h2 className="title2">Ngay trung tâm thành phố, cảnh quan tuyệt đẹp</h2>
                                             </div>
                                             <div className="btn_map col4">
@@ -438,7 +634,7 @@ return(
                     </div>
                         <ul className="homestay_list" data-aos="fade-up" data-aos-duration="2000" ></ul>
                           <>
-                            <Swiper
+                            <Swiper data-aos="fade-up" data-aos-duration="2000" 
                                 slidesPerView={4} // Hiển thị tối đa 3 slides
                                 spaceBetween={30} // Khoảng cách giữa các slides
                                 pagination={{
@@ -476,70 +672,92 @@ return(
                                 modules={[Pagination, Autoplay]}
                                 className="mySwiper"
                                 >
-                                {Array.isArray(showhomestay) && showhomestay.slice(0,20).map((homestay) =>  (
-                                <SwiperSlide>
-                                    <li key={homestay.id_homestay}>
-                                        <Link to={"/homestay/" + homestay.id_homestay}>
+                                {Array.isArray(showhomestay) && showhomestay.slice(0,10).map((homestay) =>  (
+                                    <SwiperSlide>
+                                        <li key={homestay.id_homestay}>
+                                            <p>
                                             <div className="img_homstay">
+                                            {/* Icon trái tim */}
+                                            <span 
+                                                className={`heart-icon ${existingFavorites.some(item => item.id_homestay === homestay.id_homestay) ? 'active' : ''}`} 
+                                                onClick={() => toggleFavorite(homestay)}
+                                            >
+                                                <i className="fa-solid fa-heart"></i>
+                                            </span>
+
                                                 <div className="pro-price">
-                                                    <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                                                    <span>/ Đêm</span>
+                                                <span className="price">{homestay.gia_homestay.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                <span>/ Đêm</span>
                                                 </div>
                                                 {images.length > 0 ? (
-                                                    images.map((image, index) => {
+                                                images.map((image, index) => {
                                                     if (homestay.id_homestay === image.id_hinh) {
-                                                        return (
-                                                            <div key={image.id_homestay || index} className="add_img"> {/* Sử dụng image.id hoặc index */}
-                                                                <img
-                                                                src={image.url_hinh}
-                                                                alt={homestay.ten_homestay || 'Hình ảnh homestay'}
-                                                                />
-                                                            </div>
-                                                            );
-                                                        }
-                                                        return null; // Đảm bảo có return nếu không thỏa mãn điều kiện
-                                                        })
-                                                    ) : (
-                                                        <p>Không có hình để hiển thị</p>
-                                                    )}
-                                                {/* <img src="/image/HST2.png" alt=""/> */}
+                                                    return (
+                                                        <div key={image.id_homestay || index} className="add_img">
+                                                        <img
+                                                            src={image.url_hinh}
+                                                            alt={homestay.ten_homestay || 'Hình ảnh homestay'}
+                                                        />
+                                                        </div>
+                                                    );
+                                                    }
+                                                    return null;
+                                                })
+                                                ) : (
+                                                <p>Không có hình để hiển thị</p>
+                                                )}
                                             </div>
                                             <div className="des_hst">
                                                 <div className="proloop-detail">
-                                                    <h3><Link to={"/homestay/" + homestay.id_homestay}>{homestay.ten_homestay}</Link></h3>
-                                                    <div className="pro-tag">
-                                                        <div className="tag-item tag-area">
-                                                            <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
-                                                        </div>                                     
-                                                        <div className="tag-item tag-guests">
-                                                            <span>10</span> <span className="tag-unit">Guests</span>
-                                                        </div>
-                                                        <div className="tag-item tag-bed">
-                                                            <span>5</span> <span className="tag-unit">Beds</span>
-                                                        </div>
-                                                        <div className="tag-item tag-bathroom">
-                                                            <span>4</span> <span className="tag-unit">Bathroom</span>
-                                                        </div>
+                                                <h3><Link to={"/homestay/" + homestay.id_homestay}>{homestay.ten_homestay}</Link></h3>
+                                                <div className="pro-tag">
+                                                    <div className="tag-item tag-area">
+                                                    <span>150</span> <span className="tag-unit">m<sup>2</sup></span>
                                                     </div>
-                                                    <div className="pro-desc">
-                                                        Double Suite rộng 150m² với thiết kế trong suốt, nằm ở tầng cao nhất của khách sạn, mang đến tầm nhìn toàn cảnh tuyệt đẹp...
+                                                    <div className="tag-item tag-guests">
+                                                    <span>10</span> <span className="tag-unit">Guests</span>
                                                     </div>
-                                                    <div className="btn_ev">
-                                                        <Link to={"/homestay/" + homestay.id_homestay}>
-                                                            <span>Xem chi tiết
-                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
-                                                            </span>
-                                                        </Link>
-                                                    </div>   
-                                                    
+                                                    <div className="tag-item tag-bed">
+                                                    <span>5</span> <span className="tag-unit">Beds</span>
+                                                    </div>
+                                                    <div className="tag-item tag-bathroom">
+                                                    <span>4</span> <span className="tag-unit">Bathroom</span>
+                                                    </div>
+                                                </div>
+                                                <div className="pro-desc">
+                                                    Double Suite rộng 150m² với thiết kế trong suốt, nằm ở tầng cao nhất của khách sạn, mang đến tầm nhìn toàn cảnh tuyệt đẹp...
+                                                </div>
+                                                <div className="btn_ev">
+                                                    <Link to={"/homestay/" + homestay.id_homestay}>
+                                                    <span>Xem chi tiết
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                                                        <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
+                                                        </svg>
+                                                    </span>
+                                                    </Link>
+                                                </div>
                                                 </div>
                                             </div>
-                                        </Link>
-                                    </li>
-                                </SwiperSlide>
+                                            </p>
+                                        </li>
+                                        
+                                    </SwiperSlide>
                                 ))}
                             </Swiper>
                          </>
+                          {/* Lớp phủ và thông báo */}
+                    {isNotificationVisible && (
+                        <>
+                        <div className="overlay_thongbao_user" style={{ display: 'block' }}></div>
+
+                        <div className="notification_thongbao_user" style={{ display: 'flex' }}>
+                            <p>{notificationMessage}</p>
+                            <span>{timeLeft}s</span>
+                            <button onClick={handleContinueShopping}>Tiếp tục chọn</button>
+                            <button onClick={handleGoToCart}>Xem yêu thích</button>
+                        </div>
+                        </>
+                    )}
                 </div>
             </div>
 {/* <!-- show homstay  --> */}
@@ -548,7 +766,10 @@ return(
                 <div className="min_warp2">
                     <div className="row_warp">
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_1.jpg?v=2537" alt="Dịch vụ đưa đón tại sân bay"/>
                                 </div>
@@ -559,7 +780,10 @@ return(
                             </div>
                         </div>                
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_2.jpg?v=2537" alt="Dịch vụ quản gia"/>
                                 </div>
@@ -570,7 +794,10 @@ return(
                             </div>
                         </div>      
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_3.jpg?v=2537" alt="Wifi &amp; Internet"/>
                                 </div>
@@ -581,7 +808,10 @@ return(
                             </div>
                         </div>       
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_4.jpg?v=2537" alt="Dịch vụ giặt ủi"/>
                                 </div>
@@ -592,7 +822,10 @@ return(
                             </div>
                         </div>           
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_5.jpg?v=2537" alt="Bữa sáng tại phòng"/>
                                 </div>
@@ -603,7 +836,10 @@ return(
                             </div>
                         </div>              
                         <div className="col-lg-4 col-md-6 col-12">
-                            <div className="service-item">
+                            <div className="service-item" data-aos="fade-zoom-in"
+     data-aos-easing="ease-in-back"
+     data-aos-delay="300"
+     data-aos-offset="0">
                                 <div className="item-icon">
                                     <img src="//theme.hstatic.net/200000909393/1001269498/14/home_service_img_6.jpg?v=2537" alt="Chỗ đậu xe riêng"/>
                                 </div>
@@ -673,7 +909,6 @@ return(
                                     <Link to="" title="Mountain Hiking" aria-label="Mountain Hiking">
                                         <img 
                                             className="ls-is-cached lazyloaded" 
-                                            data-src="https://file.hstatic.net/200000909393/article/img-68_93702bac2c97447b9475c6bb07a485d8.jpg" 
                                             alt="Mountain Hiking" 
                                             src="https://file.hstatic.net/200000909393/article/img-68_93702bac2c97447b9475c6bb07a485d8.jpg" 
                                         />
@@ -709,7 +944,7 @@ return(
                                     <Link to="/" title="Camping Tour" aria-label="Camping Tour">
                                         <img 
                                             className="ls-is-cached lazyloaded" 
-                                            data-src="https://file.hstatic.net/200000909393/article/img-70_23537e350baa48c5b65a977c872d0b09.jpg" 
+                                            data-src="" 
                                             alt="Camping Tour" 
                                             src="https://file.hstatic.net/200000909393/article/img-70_23537e350baa48c5b65a977c872d0b09.jpg" 
                                         />
@@ -750,7 +985,7 @@ return(
             </div>
 {/* <!-- CNdu-lich --> */}
 {/* // <!-- form email --> */}
-            <div className="email_newletter" data-aos="fade-up" data-aos-duration="1000" >
+            <div className="email_newletter" data-aos="fade-up" data-aos-duration="3000" >
                     <div className="min_warp2">
                         <div className="row_email">
                             <div className="col-lg-6 col-12">
@@ -851,18 +1086,6 @@ return(
 
                                 </Swiper>
                             </>
-                            {/* <div className="box_intagram">
-                                <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_1.jpg?v=2537" alt="Instgram 1"/>
-                            </div>   
-                            <div className="box_intagram">
-                                <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_2.jpg?v=2537" alt="Instgram 2"/>
-                            </div>            
-                            <div className="box_intagram">
-                                <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_3.jpg?v=2537" alt="Instgram 3"/>
-                            </div>           
-                            <div className="box_intagram">
-                                <img src="//theme.hstatic.net/200000909393/1001269498/14/home_instagram_img_4.jpg?v=2537" alt="Instgram 4"/>
-                            </div>            */}
                         </div>
                         <div className="btn-more text-center">
                             <a href="#"><button className="ocean-button" id="oceanButton"><i className="fa-brands fa-instagram"></i> Theo dõi trên Instagram</button></a>
@@ -870,7 +1093,9 @@ return(
                     </div>
                 </div>
 {/* <!-- footer-intagram --> */}
+              
         </div> 
+        
 
 )
 
